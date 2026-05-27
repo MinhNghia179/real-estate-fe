@@ -1,0 +1,36 @@
+{
+  "semi": true,
+  "singleQuote": true,
+  "trailingComma": "es5",
+  "tabWidth": 2,
+  "useTabs": false,
+  "printWidth": 100,
+  "bracketSpacing": true,
+  "bracketSameLine": false,
+  "arrowParens": "always",
+  "endOfLine": "lf",
+  "importOrder": [
+    "^react$",
+    "^react-native$",
+    "^expo(.*)$",
+    "^@react-navigation(.*)$",
+    "^@tanstack(.*)$",
+    "^@/(.*)$",
+    "^@components(.*)$",
+    "^@screens(.*)$",
+    "^@services(.*)$",
+    "^@stores(.*)$",
+    "^@schemas(.*)$",
+    "^@hooks(.*)$",
+    "^@utils(.*)$",
+    "^@constants(.*)$",
+    "^@models(.*)$",
+    "^@config(.*)$",
+    "^[./]"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true,
+  "plugins": [
+    "@trivago/prettier-plugin-sort-imports"
+  ]
+}

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none">
+  <!-- Tìm kiếm -->
+  <circle cx="12" cy="12" r="7.5" stroke="currentColor" stroke-width="1.8"/>
+  <line x1="17.5" y1="17.5" x2="23" y2="23" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+</svg>

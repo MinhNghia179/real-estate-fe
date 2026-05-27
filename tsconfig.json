@@ -1,0 +1,27 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "@/*": ["./*"],
+      "@components": ["./components"],
+      "@components/*": ["./components/*"],
+      "@schemas": ["./src/schemas/index"],
+      "@schemas/*": ["./src/schemas/*"],
+      "@services/*": ["./src/services/*"],
+      "@config/*": ["./src/config/*"],
+      "@hooks": ["./hooks"],
+      "@hooks/*": ["./hooks/*"],
+      "@constants": ["./constants"],
+      "@constants/*": ["./constants/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@models": ["./src/types/models"],
+      "@models/*": ["./src/types/*"],
+      "@stores/*": ["./src/stores/*"],
+      "@screens/*": ["./src/screens/*"],
+      "@assets/*": ["./assets/*"],
+      "firebase/auth": ["./node_modules/@firebase/auth/dist/rn/index.rn.d.ts"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"]
+}

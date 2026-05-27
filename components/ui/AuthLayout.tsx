@@ -2,7 +2,9 @@ import React from 'react';
 
 import {
   KeyboardAvoidingView,
+  Keyboard,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -31,38 +33,48 @@ export const AuthLayout = ({
 }: AuthLayoutProps) => {
   const insets = useSafeAreaInsets();
 
+  const handleOutsideTap = () => {
+    Keyboard.dismiss();
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
     >
-      <View style={[styles.innerContainer, { paddingTop: Math.max(insets.top, 12), paddingBottom: insets.bottom }]}>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          contentContainerStyle={[styles.scrollContent, contentContainerStyle]}
-          showsVerticalScrollIndicator={false}
-          scrollEnabled={false}
-        >
-          {/* Header */}
-          <View style={styles.header}>
-            {step && <Text style={styles.step}>{step}</Text>}
-            <Text style={styles.title}>{title}</Text>
-            {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
-          </View>
+      <Pressable style={styles.dismissArea} onPress={handleOutsideTap}>
+        <View style={[styles.innerContainer, { paddingTop: Math.max(insets.top, 12), paddingBottom: insets.bottom }]}>
+          <ScrollView
+            contentInsetAdjustmentBehavior="automatic"
+            contentContainerStyle={[styles.scrollContent, contentContainerStyle]}
+            showsVerticalScrollIndicator={false}
+            scrollEnabled={true}
+            bounces={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            {/* Header */}
+            <View style={styles.header}>
+              {step && <Text style={styles.step}>{step}</Text>}
+              <Text style={styles.title}>{title}</Text>
+              {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+            </View>
 
-          {/* Content */}
-          {children}
-        </ScrollView>
-      </View>
+            {/* Content */}
+            {children}
+          </ScrollView>
+        </View>
+      </Pressable>
     </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Palette.white },
+  dismissArea: { flex: 1 },
   innerContainer: { flex: 1, justifyContent: 'flex-start' },
   scrollContent: {
-    flex: 1,
+    flexGrow: 1,
     paddingHorizontal: Spacing.base,
     paddingVertical: Spacing.lg,
   },

@@ -40,21 +40,21 @@ export const AuthTabSwitcher = ({
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    gap: Spacing.md,
+    backgroundColor: '#F3F4F6',
+    borderRadius: Spacing.md,
+    padding: Spacing.xs,
     marginBottom: Spacing.xl,
   },
   tab: {
     flex: 1,
     paddingVertical: Spacing.md,
     paddingHorizontal: Spacing.base,
-    borderRadius: Spacing.md,
-    backgroundColor: '#F3F4F6',
+    borderRadius: Spacing.sm,
+    backgroundColor: 'transparent',
     alignItems: 'center',
   },
   tabActive: {
     backgroundColor: Palette.white,
-    borderWidth: 1.5,
-    borderColor: Palette.orange,
   },
   tabText: {
     fontSize: FontSize.body,

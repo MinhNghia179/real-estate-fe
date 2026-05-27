@@ -20,6 +20,7 @@ import { FontSize, Palette, Spacing } from '@constants/theme';
 
 import { authService } from '@services/authService';
 import { useAuthStore } from '@stores/authStore';
+import { useLocale } from '@contexts/locale-context';
 
 import type { RegisterInput } from '@schemas';
 import { RegisterSchema } from '@schemas';
@@ -27,13 +28,14 @@ import { RegisterSchema } from '@schemas';
 type AuthMethod = 'phone' | 'email';
 
 export default function RegisterScreen() {
+  const { t } = useLocale();
   const [authMethod, setAuthMethod] = useState<AuthMethod>('phone');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const setUser = useAuthStore((s) => s.setUser);
 
   const handleSubmit = async (values: RegisterInput) => {
     if (!agreedToTerms) {
-      Alert.alert('Lỗi', 'Bạn phải đồng ý với Điều khoản dịch vụ');
+      Alert.alert('Lỗi', t.auth.errors.agreeToTerms);
       return;
     }
 
@@ -45,7 +47,7 @@ export default function RegisterScreen() {
         params: { email: user.email, purpose: 'register' },
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Đăng ký thất bại';
+      const message = error instanceof Error ? error.message : t.auth.errors.signUpFailed;
       Alert.alert('Lỗi', message);
     }
   };
@@ -60,16 +62,16 @@ export default function RegisterScreen() {
 
   return (
     <AuthLayout
-      step="Bước 1 / 4"
-      title="Tạo tài khoản"
-      subtitle="Đăng ký bằng email hoặc số điện thoại để bắt đầu."
+      step={t.register.step}
+      title={t.register.title}
+      subtitle={t.register.subtitle}
       contentContainerStyle={styles.content}
     >
       {/* Tab Switcher */}
       <AuthTabSwitcher
         tabs={[
-          { id: 'phone', label: 'Số điện thoại' },
-          { id: 'email', label: 'Email' },
+          { id: 'phone', label: t.register.tabs.phone },
+          { id: 'email', label: t.register.tabs.email },
         ]}
         activeTab={authMethod}
         onTabChange={(tab) => setAuthMethod(tab as AuthMethod)}
@@ -90,101 +92,107 @@ export default function RegisterScreen() {
           isSubmitting,
         }) => (
           <View style={styles.form}>
-            {/* Phone or Email */}
-            {authMethod === 'phone' ? (
-              <PhoneInput
-                label="SỐ ĐIỆN THOẠI"
-                placeholder="912 345 678"
-                value={values.phone || ''}
-                onChangeText={handleChange('phone')}
-                onBlur={() => handleBlur('phone')}
-                error={
-                  touched.phone && errors.phone ? errors.phone : undefined
-                }
-              />
-            ) : (
+            {/* Inputs Section */}
+            <View style={styles.inputsSection}>
+              {/* Phone or Email */}
+              {authMethod === 'phone' ? (
+                <PhoneInput
+                  label={t.auth.labels.phoneNumber}
+                  placeholder={t.register.tabs.phone}
+                  value={values.phone || ''}
+                  onChangeText={handleChange('phone')}
+                  onBlur={() => handleBlur('phone')}
+                  error={
+                    touched.phone && errors.phone ? errors.phone : undefined
+                  }
+                />
+              ) : (
+                <Input
+                  label={t.auth.labels.email}
+                  placeholder={t.auth.placeholders.email}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  value={values.email}
+                  onChangeText={handleChange('email')}
+                  onBlur={handleBlur('email')}
+                  error={
+                    touched.email && errors.email ? errors.email : undefined
+                  }
+                />
+              )}
+
+              {/* Password */}
               <Input
-                label="Email"
-                placeholder="example@email.com"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                value={values.email}
-                onChangeText={handleChange('email')}
-                onBlur={handleBlur('email')}
+                label={t.auth.labels.password}
+                placeholder={t.auth.placeholders.password}
+                isPassword
+                value={values.password}
+                onChangeText={handleChange('password')}
+                onBlur={() => handleBlur('password')}
                 error={
-                  touched.email && errors.email ? errors.email : undefined
+                  touched.password && errors.password
+                    ? errors.password
+                    : undefined
                 }
               />
-            )}
 
-            {/* Password */}
-            <Input
-              label="MẬT KHẨU"
-              placeholder="Tối thiểu 8 ký tự"
-              isPassword
-              value={values.password}
-              onChangeText={handleChange('password')}
-              onBlur={() => handleBlur('password')}
-              error={
-                touched.password && errors.password
-                  ? errors.password
-                  : undefined
-              }
-            />
-
-            {/* Terms & Conditions */}
-            <TouchableOpacity
-              style={styles.checkboxContainer}
-              onPress={() => setAgreedToTerms(!agreedToTerms)}
-            >
-              <View
-                style={[
-                  styles.checkbox,
-                  agreedToTerms && styles.checkboxChecked,
-                ]}
+              {/* Terms & Conditions */}
+              <TouchableOpacity
+                style={styles.checkboxContainer}
+                onPress={() => setAgreedToTerms(!agreedToTerms)}
               >
-                {agreedToTerms && (
-                  <Ionicons name="checkmark" size={16} color="#fff" />
-                )}
+                <View
+                  style={[
+                    styles.checkbox,
+                    agreedToTerms && styles.checkboxChecked,
+                  ]}
+                >
+                  {agreedToTerms && (
+                    <Ionicons name="checkmark" size={16} color="#fff" />
+                  )}
+                </View>
+                <View style={styles.termsTextContainer}>
+                  <Text style={styles.termsMainText}>
+                    {t.register.agreeTerms}
+                    <Text style={styles.termsLink}>{t.register.termsOfService}</Text>
+                    {t.register.and}
+                    <Text style={styles.termsLink}>{t.register.privacyPolicy}</Text>
+                    {t.register.ofDatVang}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+
+            {/* Buttons Section */}
+            <View style={styles.buttonsSection}>
+              {/* Submit Button */}
+              <Button
+                label={t.register.continueButton}
+                onPress={() => handleSubmit()}
+                disabled={isSubmitting || !agreedToTerms}
+                loading={isSubmitting}
+                style={styles.button}
+              />
+
+              {/* Social Login */}
+              <SocialLoginButtons
+                onPress={(provider) =>
+                  Alert.alert(
+                    `${provider} Sign In chưa được triển khai`
+                  )
+                }
+                containerStyle={styles.socialSection}
+              />
+
+              {/* Login Link */}
+              <View style={styles.footer}>
+                <Text style={styles.footerText}>{t.register.haveAccount}</Text>
+                <Link href="/login" asChild>
+                  <TouchableOpacity>
+                    <Text style={styles.footerLink}>{t.register.signIn}</Text>
+                  </TouchableOpacity>
+                </Link>
               </View>
-              <View style={styles.termsTextContainer}>
-                <Text style={styles.termsMainText}>
-                  Tôi đồng ý với{' '}
-                  <Text style={styles.termsLink}>Điều khoản dịch vụ</Text>
-                  {' '}và{' '}
-                  <Text style={styles.termsLink}>Chính sách bảo mật</Text>
-                  {' '}của Đất Vàng.
-                </Text>
-              </View>
-            </TouchableOpacity>
-
-            {/* Submit Button */}
-            <Button
-              label="Tiếp tục"
-              onPress={() => handleSubmit()}
-              disabled={isSubmitting || !agreedToTerms}
-              loading={isSubmitting}
-              style={styles.button}
-            />
-
-            {/* Social Login */}
-            <SocialLoginButtons
-              onPress={(provider) =>
-                Alert.alert(
-                  `${provider} Sign In chưa được triển khai`
-                )
-              }
-              containerStyle={styles.socialSection}
-            />
-
-            {/* Login Link */}
-            <View style={styles.footer}>
-              <Text style={styles.footerText}>Đã có tài khoản? </Text>
-              <Link href="/login" asChild>
-                <TouchableOpacity>
-                  <Text style={styles.footerLink}>Đăng nhập</Text>
-                </TouchableOpacity>
-              </Link>
             </View>
           </View>
         )}
@@ -194,8 +202,14 @@ export default function RegisterScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { marginBottom: Spacing.xl },
-  form: { gap: Spacing.lg },
+  content: { marginBottom: 0 },
+  form: {
+    flex: 1,
+    justifyContent: 'space-between',
+    gap: Spacing.lg,
+  },
+  inputsSection: { gap: Spacing.lg },
+  buttonsSection: { gap: 0 },
 
   /* Checkbox */
   checkboxContainer: {

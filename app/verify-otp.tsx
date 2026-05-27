@@ -13,10 +13,12 @@ import { router, useLocalSearchParams } from 'expo-router';
 
 import { AuthLayout, Button } from '@components/ui';
 import { FontSize, Palette, Spacing } from '@constants/theme';
+import { useLocale } from '@contexts/locale-context';
 
 const OTP_LENGTH = 6;
 
 export default function VerifyOTPScreen() {
+  const { t } = useLocale();
   const { email, purpose } = useLocalSearchParams<{
     email: string;
     purpose?: string;
@@ -52,7 +54,7 @@ export default function VerifyOTPScreen() {
 
   const handleVerifyOTP = async (code: string = otp) => {
     if (code.length !== OTP_LENGTH) {
-      Alert.alert('Lỗi', 'Vui lòng nhập đủ 6 chữ số');
+      Alert.alert('Lỗi', t.verifyOtp.errors.invalidOtp);
       return;
     }
 
@@ -60,7 +62,7 @@ export default function VerifyOTPScreen() {
       setIsLoading(true);
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      Alert.alert('Thành công', 'Xác minh OTP thành công!', [
+      Alert.alert('Thành công', t.verifyOtp.subtitle, [
         {
           text: 'OK',
           onPress: () => {
@@ -74,7 +76,7 @@ export default function VerifyOTPScreen() {
       ]);
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : 'Xác minh thất bại';
+        error instanceof Error ? error.message : t.verifyOtp.errors.verifyFailed;
       Alert.alert('Lỗi', message);
     } finally {
       setIsLoading(false);
@@ -118,90 +120,100 @@ export default function VerifyOTPScreen() {
   return (
     <AuthLayout
       step="Bước 2 / 4"
-      title="Xác thực OTP"
+      title={t.verifyOtp.title}
       subtitle={
         email
-          ? `Mã 6 chữ số đã gửi đến ${email}`
-          : 'Mã 6 chữ số đã gửi đến điện thoại của bạn'
+          ? `${t.verifyOtp.subtitle} ${email}`
+          : t.verifyOtp.subtitle
       }
       contentContainerStyle={styles.content}
     >
-      {/* OTP Input Boxes */}
-      <View style={styles.otpSection}>
-        <TextInput
-          ref={inputRef}
-          style={styles.hiddenInput}
-          value={otp}
-          onChangeText={handleOTPChange}
-          keyboardType="numeric"
-          maxLength={OTP_LENGTH}
-          autoFocus
-        />
+      <View style={styles.form}>
+        {/* OTP Input Boxes */}
+        <View style={styles.otpSection}>
+          <TextInput
+            ref={inputRef}
+            style={styles.hiddenInput}
+            value={otp}
+            onChangeText={handleOTPChange}
+            keyboardType="numeric"
+            maxLength={OTP_LENGTH}
+            autoFocus
+          />
 
-        <View style={styles.otpBoxesContainer}>
-          {Array.from({ length: OTP_LENGTH }).map((_, index) => (
-            <View
-              key={index}
-              style={[
-                styles.otpBox,
-                index < otp.length && styles.otpBoxFilled,
-                index === otp.length && styles.otpBoxActive,
-              ]}
-            >
-              <Text style={styles.otpBoxText}>{otp[index] || ''}</Text>
-            </View>
-          ))}
+          <View style={styles.otpBoxesContainer}>
+            {Array.from({ length: OTP_LENGTH }).map((_, index) => (
+              <View
+                key={index}
+                style={[
+                  styles.otpBox,
+                  index < otp.length && styles.otpBoxFilled,
+                  index === otp.length && styles.otpBoxActive,
+                ]}
+              >
+                <Text style={styles.otpBoxText}>{otp[index] || ''}</Text>
+              </View>
+            ))}
+          </View>
         </View>
-      </View>
 
-      {/* Resend Section */}
-      <View style={styles.resendSection}>
-        <View style={styles.resendTextContainer}>
-          <Text style={styles.resendLabel}>Chưa nhận được mã?</Text>
-          {canResend ? (
-            <TouchableOpacity onPress={handleResendOTP} disabled={isLoading}>
-              <Text style={styles.resendLink}>Gửi lại</Text>
-            </TouchableOpacity>
-          ) : (
-            <Text style={styles.resendTimer}>
-              Gửi lại sau {formatTime(timeLeft)}
+        {/* Resend Section */}
+        <View style={styles.resendSection}>
+          <View style={styles.resendTextContainer}>
+            <Text style={styles.resendLabel}>Chưa nhận được mã?</Text>
+            {canResend ? (
+              <TouchableOpacity onPress={handleResendOTP} disabled={isLoading}>
+                <Text style={styles.resendLink}>{t.verifyOtp.resendButton}</Text>
+              </TouchableOpacity>
+            ) : (
+              <Text style={styles.resendTimer}>
+                {t.verifyOtp.resendIn}{formatTime(timeLeft)}
+              </Text>
+            )}
+          </View>
+        </View>
+
+        {/* Error Message */}
+        {resendCount > 2 && (
+          <View style={styles.errorBox}>
+            <Text style={styles.errorBoxTitle}>⚠ Không nhận được tin nhắn?</Text>
+            <Text style={styles.errorBoxText}>
+              Thử nhận mã qua cuộc gọi tự động hoặc liên hệ hỗ trợ.
             </Text>
-          )}
+          </View>
+        )}
+
+        {/* Submit Button */}
+        <View style={styles.buttonsSection}>
+          <Button
+            label={t.verifyOtp.verifyButton}
+            onPress={() => handleVerifyOTP()}
+            disabled={isLoading || otp.length !== OTP_LENGTH}
+            loading={isLoading}
+            style={styles.button}
+          />
+
+          {/* Change Phone Link */}
+          <TouchableOpacity
+            onPress={handleChangePhone}
+            style={styles.changePhoneButton}
+          >
+            <Text style={styles.changePhoneText}>Thay đổi số điện thoại</Text>
+          </TouchableOpacity>
         </View>
       </View>
-
-      {/* Error Message */}
-      {resendCount > 2 && (
-        <View style={styles.errorBox}>
-          <Text style={styles.errorBoxTitle}>⚠ Không nhận được tin nhắn?</Text>
-          <Text style={styles.errorBoxText}>
-            Thử nhận mã qua cuộc gọi tự động hoặc liên hệ hỗ trợ.
-          </Text>
-        </View>
-      )}
-
-      {/* Submit Button */}
-      <Button
-        label="Xác nhận"
-        onPress={() => handleVerifyOTP()}
-        disabled={isLoading || otp.length !== OTP_LENGTH}
-        loading={isLoading}
-        style={styles.button}
-      />
-
-      {/* Change Phone Link */}
-      <TouchableOpacity
-        onPress={handleChangePhone}
-        style={styles.changePhoneButton}
-      >
-        <Text style={styles.changePhoneText}>Thay đổi số điện thoại</Text>
-      </TouchableOpacity>
     </AuthLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { marginBottom: Spacing.xl },
+  content: { marginBottom: 0 },
+  form: {
+    flex: 1,
+    justifyContent: 'space-between',
+    gap: Spacing.lg,
+  },
+  buttonsSection: { gap: 0 },
 
   /* OTP Section */
   otpSection: {

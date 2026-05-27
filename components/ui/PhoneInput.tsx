@@ -1,9 +1,8 @@
 import React from 'react';
 
-import { StyleSheet, Text, View, type ViewStyle } from 'react-native';
+import { StyleSheet, Text, TextInput, View, type ViewStyle } from 'react-native';
 
 import { FontSize, Palette, Spacing } from '@constants/theme';
-import { Input } from './Input';
 
 interface PhoneInputProps {
   label?: string;
@@ -31,20 +30,26 @@ export const PhoneInput = ({
   return (
     <View style={containerStyle}>
       {label && <Text style={styles.label}>{label}</Text>}
-      <View style={styles.container}>
+      <View
+        style={[
+          styles.inputContainer,
+          error ? styles.inputError : styles.inputNormal,
+        ]}
+      >
         <Text style={styles.countryCode}>
           {countryEmoji} {countryCode}
         </Text>
-        <Input
+        <TextInput
+          style={styles.input}
           placeholder={placeholder}
+          placeholderTextColor={Palette.textMuted}
           keyboardType="phone-pad"
           value={value}
           onChangeText={onChangeText}
-          onBlur={() => onBlur()}
-          error={error}
-          containerStyle={styles.inputWrapper}
+          onBlur={onBlur}
         />
       </View>
+      {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
   );
 };
@@ -58,20 +63,38 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
     marginBottom: Spacing.sm,
   },
-  container: {
+  inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.md,
+    borderRadius: Spacing.md,
+    paddingHorizontal: Spacing.md,
+    minHeight: 48,
+  },
+  inputNormal: {
+    borderWidth: 1,
+    borderColor: Palette.border,
+    backgroundColor: Palette.white,
+  },
+  inputError: {
+    borderWidth: 1.5,
+    borderColor: '#EF4444',
+    backgroundColor: Palette.white,
   },
   countryCode: {
     fontSize: FontSize.h3,
     fontWeight: '600',
     color: Palette.textPrimary,
-    paddingHorizontal: Spacing.md,
-    borderRightWidth: 1,
-    borderRightColor: Palette.border,
+    marginRight: Spacing.md,
   },
-  inputWrapper: {
+  input: {
     flex: 1,
+    fontSize: FontSize.body,
+    color: Palette.textPrimary,
+    padding: 0,
+  },
+  errorText: {
+    fontSize: FontSize.caption,
+    color: '#EF4444',
+    marginTop: Spacing.xs,
   },
 });

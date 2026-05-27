@@ -20,6 +20,9 @@
       "@stores/*": ["./src/stores/*"],
       "@screens/*": ["./src/screens/*"],
       "@assets/*": ["./assets/*"],
+      "@locales": ["./src/locales/index"],
+      "@locales/*": ["./src/locales/*"],
+      "@contexts/*": ["./src/contexts/*"],
       "firebase/auth": ["./node_modules/@firebase/auth/dist/rn/index.rn.d.ts"]
     }
   },

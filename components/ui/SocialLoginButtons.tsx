@@ -34,9 +34,11 @@ export const SocialLoginButtons = ({
 }: SocialLoginButtonsProps) => {
   return (
     <View style={containerStyle}>
-      {/* Divider */}
-      <View style={styles.divider}>
+      {/* Divider with lines */}
+      <View style={styles.dividerContainer}>
+        <View style={styles.dividerLine} />
         <Text style={styles.dividerText}>hoặc tiếp tục với</Text>
+        <View style={styles.dividerLine} />
       </View>
 
       {/* Buttons */}
@@ -56,13 +58,21 @@ export const SocialLoginButtons = ({
 };
 
 const styles = StyleSheet.create({
-  divider: {
+  dividerContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: Spacing.md,
     marginVertical: Spacing.lg,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: Palette.border,
   },
   dividerText: {
     fontSize: FontSize.body,
     color: Palette.textMuted,
+    fontWeight: '500',
   },
   buttonsContainer: {
     flexDirection: 'row',

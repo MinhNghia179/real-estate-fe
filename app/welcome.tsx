@@ -13,40 +13,35 @@ import {
 
 import { Text } from '@/components/text';
 import { Button } from '@/components/ui/Button';
+import { LanguageSelector } from '@/components/ui/language-selector';
 import { Palette, Radius, Spacing } from '@/constants/theme';
+import { useLocale } from '@contexts/locale-context';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-const slides = [
-  {
-    id: '1',
-    image: require('@/assets/images/welcome_slide_1.png'),
-    label: 'BẤT ĐỘNG SẢN CAO CẤP',
-    title: 'Đăng tin nhanh,',
-    titleBold: 'tiếp cận triệu khách.',
-    description: 'Đưa bất động sản của bạn đến đúng người — chỉ trong vài bước đơn giản.',
-  },
-  {
-    id: '2',
-    image: require('@/assets/images/welcome_slide_2.png'),
-    label: 'MUA BÁN & CHO THUÊ',
-    title: 'Giao dịch minh bạch,',
-    titleBold: 'an toàn & hiệu quả.',
-    description: 'Nhà phố, căn hộ, đất nền — tất cả trên một nền tảng đáng tin cậy.',
-  },
-  {
-    id: '3',
-    image: require('@/assets/images/welcome_slide_3.png'),
-    label: 'MẠNG LƯỚI MÔI GIỚI',
-    title: 'Kết nối chuyên gia,',
-    titleBold: 'chốt deal nhanh chóng.',
-    description: 'Hệ thống môi giới được xác thực, sẵn sàng đồng hành cùng bạn.',
-  },
-];
+interface Slide {
+  id: string;
+  image: any;
+  label: string;
+  title: string;
+  titleBold: string;
+  description: string;
+}
 
 export default function WelcomeScreen() {
+  const { t } = useLocale();
   const [activeIndex, setActiveIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
+  const slides: Slide[] = t.welcome.slides.map((slide, index) => ({
+    id: String(index + 1),
+    image:
+      index === 0
+        ? require('@/assets/images/welcome_slide_1.png')
+        : index === 1
+          ? require('@/assets/images/welcome_slide_2.png')
+          : require('@/assets/images/welcome_slide_3.png'),
+    ...slide,
+  }));
 
   const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const index = Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH);
@@ -106,7 +101,7 @@ export default function WelcomeScreen() {
 
         {/* Thin line indicators — phong cách luxury */}
         <View style={styles.dotsContainer}>
-          {slides.map((_, index) => (
+          {slides.map((_: Slide, index: number) => (
             <View
               key={index}
               style={[
@@ -120,13 +115,16 @@ export default function WelcomeScreen() {
         {/* Buttons */}
         <View style={styles.buttonsRow}>
           <Link href="/register" asChild style={styles.buttonFlex}>
-            <Button label="Đăng ký" variant="primary" size="lg" />
+            <Button label={t.welcome.registerButton} variant="primary" size="lg" />
           </Link>
           <Link href="/login" asChild style={styles.buttonFlex}>
-            <Button label="Đăng nhập" variant="secondary" size="lg" />
+            <Button label={t.welcome.loginButton} variant="secondary" size="lg" />
           </Link>
         </View>
       </View>
+
+      {/* Language Selector */}
+      <LanguageSelector />
     </View>
   );
 }

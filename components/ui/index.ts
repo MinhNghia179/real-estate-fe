@@ -7,6 +7,7 @@ export { ChatBubble } from './ChatBubble';
 export { Chip } from './Chip';
 export { DetailHeader, HomeHeader, ModalHeader } from './Header';
 export { Input } from './Input';
+export { LanguageSelector } from './language-selector';
 export { ListMenuItem } from './ListMenuItem';
 export { NotificationItem } from './NotificationItem';
 export { OTPInput } from './OTPInput';

@@ -17,6 +17,7 @@ import { AuthLayout, Button, Input } from '@components/ui';
 import { FontSize, Palette, Spacing } from '@constants/theme';
 
 import { useAuthStore } from '@stores/authStore';
+import { useLocale } from '@contexts/locale-context';
 import { z } from 'zod';
 
 type Role = 'buyer' | 'broker';
@@ -31,6 +32,7 @@ const UpdateProfileSchema = z.object({
 type UpdateProfileInput = z.infer<typeof UpdateProfileSchema>;
 
 export default function CompleteProfileScreen() {
+  const { t } = useLocale();
   const { role } = useLocalSearchParams<{ role: Role }>();
   const user = useAuthStore((s) => s.user);
   const setUser = useAuthStore((s) => s.setUser);

@@ -10,6 +10,8 @@ import {
   type ViewStyle,
 } from 'react-native';
 
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { FontSize, Palette, Spacing } from '@constants/theme';
 
 interface AuthLayoutProps {
@@ -27,34 +29,40 @@ export const AuthLayout = ({
   subtitle,
   contentContainerStyle,
 }: AuthLayoutProps) => {
+  const insets = useSafeAreaInsets();
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        contentContainerStyle={[styles.scrollContent, contentContainerStyle]}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Header */}
-        <View style={styles.header}>
-          {step && <Text style={styles.step}>{step}</Text>}
-          <Text style={styles.title}>{title}</Text>
-          {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
-        </View>
+      <View style={[styles.innerContainer, { paddingTop: Math.max(insets.top, 12), paddingBottom: insets.bottom }]}>
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          contentContainerStyle={[styles.scrollContent, contentContainerStyle]}
+          showsVerticalScrollIndicator={false}
+          scrollEnabled={false}
+        >
+          {/* Header */}
+          <View style={styles.header}>
+            {step && <Text style={styles.step}>{step}</Text>}
+            <Text style={styles.title}>{title}</Text>
+            {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+          </View>
 
-        {/* Content */}
-        {children}
-      </ScrollView>
+          {/* Content */}
+          {children}
+        </ScrollView>
+      </View>
     </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Palette.white },
+  innerContainer: { flex: 1, justifyContent: 'flex-start' },
   scrollContent: {
-    flexGrow: 1,
+    flex: 1,
     paddingHorizontal: Spacing.base,
     paddingVertical: Spacing.lg,
   },

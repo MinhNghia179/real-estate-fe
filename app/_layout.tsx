@@ -17,6 +17,8 @@ import { useAuthStore } from '@stores/authStore';
 
 import { queryClient } from '@config/queryClient';
 
+import { LocaleProvider } from '@/src/contexts/locale-context';
+
 export const unstable_settings = {
   anchor: 'welcome',
 };
@@ -45,18 +47,20 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <AuthGate />
-        <Stack>
-          <Stack.Screen name="welcome" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="login" options={{ headerShown: false }} />
-          <Stack.Screen name="register" options={{ headerShown: false }} />
-          <Stack.Screen name="forgot-password" options={{ title: 'Quên mật khẩu' }} />
-          <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-        </Stack>
-        <StatusBar style="auto" />
-      </ThemeProvider>
+      <LocaleProvider>
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <AuthGate />
+          <Stack>
+            <Stack.Screen name="welcome" options={{ headerShown: false }} />
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="login" options={{ headerShown: false }} />
+            <Stack.Screen name="register" options={{ headerShown: false }} />
+            <Stack.Screen name="forgot-password" options={{ title: 'Quên mật khẩu' }} />
+            <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+          </Stack>
+          <StatusBar style="auto" />
+        </ThemeProvider>
+      </LocaleProvider>
     </QueryClientProvider>
   );
 }

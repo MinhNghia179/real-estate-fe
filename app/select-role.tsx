@@ -5,10 +5,12 @@ import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { AuthLayout, Button } from '@components/ui';
 import { FontSize, Palette, Spacing } from '@constants/theme';
+import { useLocale } from '@contexts/locale-context';
 
 type RoleType = 'buyer' | 'broker' | null;
 
 export default function SelectRoleScreen() {
+  const { t } = useLocale();
   const [selectedRole, setSelectedRole] = useState<RoleType>(null);
 
   const handleContinue = () => {
@@ -64,49 +66,59 @@ export default function SelectRoleScreen() {
   return (
     <AuthLayout
       step="Bước 3 / 4"
-      title="Chọn vai trò"
-      subtitle="Bạn muốn sử dụng Đất Vàng để làm gì?"
+      title={t.selectRole.title}
+      subtitle={t.selectRole.subtitle}
       contentContainerStyle={styles.content}
     >
-      <View style={styles.rolesContainer}>
-        <RoleCard
-          id="buyer"
-          emoji="🏠"
-          title="Người mua / Thuê"
-          description="Tìm kiếm và so sánh các bất động sản"
-        />
-        <RoleCard
-          id="broker"
-          emoji="💼"
-          title="Môi giới / Bán"
-          description="Đăng tin, quản lý và bán bất động sản"
-        />
+      <View style={styles.form}>
+        <View style={styles.rolesContainer}>
+          <RoleCard
+            id="buyer"
+            emoji="🏠"
+            title={t.selectRole.buyer}
+            description={t.selectRole.buyerDesc}
+          />
+          <RoleCard
+            id="broker"
+            emoji="💼"
+            title={t.selectRole.broker}
+            description={t.selectRole.brokerDesc}
+          />
+        </View>
+
+        <View style={styles.buttonsSection}>
+          <Button
+            label={t.selectRole.continueButton}
+            onPress={handleContinue}
+            disabled={!selectedRole}
+            style={styles.button}
+          />
+
+          <TouchableOpacity
+            onPress={() => router.replace('/(tabs)')}
+            style={styles.skipButton}
+          >
+            <Text style={styles.skipText}>Bỏ qua bước này</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-
-      <Button
-        label="Tiếp tục"
-        onPress={handleContinue}
-        disabled={!selectedRole}
-        style={styles.button}
-      />
-
-      <TouchableOpacity
-        onPress={() => router.replace('/(tabs)')}
-        style={styles.skipButton}
-      >
-        <Text style={styles.skipText}>Bỏ qua bước này</Text>
-      </TouchableOpacity>
     </AuthLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { marginBottom: Spacing.xl },
+  content: { marginBottom: 0 },
+  form: {
+    flex: 1,
+    justifyContent: 'space-between',
+    gap: Spacing.lg,
+  },
+  buttonsSection: { gap: 0 },
 
   /* Roles Container */
   rolesContainer: {
     gap: Spacing.lg,
-    marginBottom: Spacing.xxl,
+    marginBottom: 0,
   },
 
   /* Role Card */

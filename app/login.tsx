@@ -19,6 +19,7 @@ import { FontSize, Palette, Spacing } from '@constants/theme';
 
 import { authService } from '@services/authService';
 import { useAuthStore } from '@stores/authStore';
+import { useLocale } from '@contexts/locale-context';
 
 import type { LoginInput } from '@schemas';
 import { LoginSchema } from '@schemas';
@@ -26,6 +27,7 @@ import { LoginSchema } from '@schemas';
 type AuthMethod = 'phone' | 'email';
 
 export default function LoginScreen() {
+  const { t } = useLocale();
   const [authMethod, setAuthMethod] = useState<AuthMethod>('phone');
   const setUser = useAuthStore((s) => s.setUser);
 
@@ -38,8 +40,8 @@ export default function LoginScreen() {
       const message =
         error instanceof Error
           ? error.message
-          : 'Email hoặc mật khẩu không đúng';
-      Alert.alert('Đăng nhập thất bại', message);
+          : t.auth.errors.invalidEmail;
+      Alert.alert(t.auth.errors.signInFailed, message);
     }
   };
 
@@ -50,15 +52,15 @@ export default function LoginScreen() {
 
   return (
     <AuthLayout
-      title="Đăng nhập"
-      subtitle="Đăng nhập bằng email hoặc số điện thoại để tiếp tục."
+      title={t.login.title}
+      subtitle={t.login.subtitle}
       contentContainerStyle={styles.content}
     >
       {/* Tab Switcher */}
       <AuthTabSwitcher
         tabs={[
-          { id: 'phone', label: 'Số điện thoại' },
-          { id: 'email', label: 'Email' },
+          { id: 'phone', label: t.login.tabs.phone },
+          { id: 'email', label: t.login.tabs.email },
         ]}
         activeTab={authMethod}
         onTabChange={(tab) => setAuthMethod(tab as AuthMethod)}
@@ -79,82 +81,88 @@ export default function LoginScreen() {
           isSubmitting,
         }) => (
           <View style={styles.form}>
-            {/* Email Input */}
-            {authMethod === 'email' ? (
+            {/* Inputs Section */}
+            <View style={styles.inputsSection}>
+              {/* Email Input */}
+              {authMethod === 'email' ? (
+                <Input
+                  label={t.auth.labels.email}
+                  placeholder={t.login.emailPlaceholder}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  value={values.email}
+                  onChangeText={handleChange('email')}
+                  onBlur={() => handleBlur('email')}
+                  error={
+                    touched.email && errors.email ? errors.email : undefined
+                  }
+                />
+              ) : (
+                <PhoneInput
+                  label={t.auth.labels.phoneNumber}
+                  placeholder={t.login.phonePlaceholder}
+                  value={values.email}
+                  onChangeText={handleChange('email')}
+                  onBlur={() => handleBlur('email')}
+                  error={
+                    touched.email && errors.email ? errors.email : undefined
+                  }
+                />
+              )}
+
+              {/* Password */}
               <Input
-                label="Email"
-                placeholder="example@email.com"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                value={values.email}
-                onChangeText={handleChange('email')}
-                onBlur={() => handleBlur('email')}
+                label={t.auth.labels.password}
+                placeholder={t.login.passwordPlaceholder}
+                isPassword
+                value={values.password}
+                onChangeText={handleChange('password')}
+                onBlur={handleBlur('password')}
                 error={
-                  touched.email && errors.email ? errors.email : undefined
+                  touched.password && errors.password
+                    ? errors.password
+                    : undefined
                 }
               />
-            ) : (
-              <PhoneInput
-                label="SỐ ĐIỆN THOẠI"
-                placeholder="912 345 678"
-                value={values.email}
-                onChangeText={handleChange('email')}
-                onBlur={() => handleBlur('email')}
-                error={
-                  touched.email && errors.email ? errors.email : undefined
-                }
-              />
-            )}
 
-            {/* Password */}
-            <Input
-              label="MẬT KHẨU"
-              placeholder="Tối thiểu 8 ký tự"
-              isPassword
-              value={values.password}
-              onChangeText={handleChange('password')}
-              onBlur={handleBlur('password')}
-              error={
-                touched.password && errors.password
-                  ? errors.password
-                  : undefined
-              }
-            />
-
-            {/* Forgot Password Link */}
-            <Link href="/forgot-password" asChild>
-              <TouchableOpacity style={styles.forgotLink}>
-                <Text style={styles.forgotLinkText}>Quên mật khẩu?</Text>
-              </TouchableOpacity>
-            </Link>
-
-            {/* Submit Button */}
-            <Button
-              label="Đăng nhập"
-              onPress={() => handleSubmit()}
-              disabled={isSubmitting}
-              loading={isSubmitting}
-              style={styles.button}
-            />
-
-            {/* Social Login */}
-            <SocialLoginButtons
-              onPress={(provider) =>
-                Alert.alert(
-                  `${provider} Sign In chưa được triển khai`
-                )
-              }
-              containerStyle={styles.socialSection}
-            />
-
-            {/* Register Link */}
-            <View style={styles.footer}>
-              <Text style={styles.footerText}>Chưa có tài khoản? </Text>
-              <Link href="/register" asChild>
-                <TouchableOpacity>
-                  <Text style={styles.footerLink}>Đăng ký ngay</Text>
+              {/* Forgot Password Link */}
+              <Link href="/forgot-password" asChild>
+                <TouchableOpacity style={styles.forgotLink}>
+                  <Text style={styles.forgotLinkText}>{t.login.forgotPassword}</Text>
                 </TouchableOpacity>
               </Link>
+            </View>
+
+            {/* Buttons Section */}
+            <View style={styles.buttonsSection}>
+              {/* Submit Button */}
+              <Button
+                label={t.login.signInButton}
+                onPress={() => handleSubmit()}
+                disabled={isSubmitting}
+                loading={isSubmitting}
+                style={styles.button}
+              />
+
+              {/* Social Login */}
+              <SocialLoginButtons
+                onPress={(provider) =>
+                  Alert.alert(
+                    `${provider} Sign In chưa được triển khai`
+                  )
+                }
+                containerStyle={styles.socialSection}
+              />
+
+              {/* Register Link */}
+              <View style={styles.footer}>
+                <Text style={styles.footerText}>{t.login.noAccount}</Text>
+                <Link href="/register" asChild>
+                  <TouchableOpacity>
+                    <Text style={styles.footerLink}>{t.login.signUpNow}</Text>
+                  </TouchableOpacity>
+                </Link>
+              </View>
             </View>
           </View>
         )}
@@ -164,8 +172,14 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { marginBottom: Spacing.xl },
-  form: { gap: Spacing.lg },
+  content: { marginBottom: 0 },
+  form: {
+    flex: 1,
+    justifyContent: 'space-between',
+    gap: Spacing.xl,
+  },
+  inputsSection: { gap: Spacing.lg },
+  buttonsSection: { gap: 0 },
 
   /* Forgot Password */
   forgotLink: { alignSelf: 'flex-end', paddingVertical: Spacing.sm },

@@ -3,28 +3,30 @@ import { toFormikValidationSchema } from 'zod-formik-adapter';
 
 import React, { useState } from 'react';
 
-import {
-  ActivityIndicator,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { Link, router } from 'expo-router';
 
-import { authService } from '@services/authService';
+import {
+  AuthLayout,
+  AuthTabSwitcher,
+  Button,
+  Input,
+  PhoneInput,
+  SocialLoginButtons,
+} from '@components/ui';
+import { FontSize, Palette, Spacing } from '@constants/theme';
 
+import { authService } from '@services/authService';
 import { useAuthStore } from '@stores/authStore';
 
-import { LoginSchema } from '@schemas';
 import type { LoginInput } from '@schemas';
+import { LoginSchema } from '@schemas';
+
+type AuthMethod = 'phone' | 'email';
 
 export default function LoginScreen() {
+  const [authMethod, setAuthMethod] = useState<AuthMethod>('phone');
   const setUser = useAuthStore((s) => s.setUser);
 
   const handleSubmit = async (values: LoginInput) => {
@@ -32,108 +34,166 @@ export default function LoginScreen() {
       const user = await authService.signIn(values);
       setUser(user);
       router.replace('/(tabs)');
-    } catch {
-      Alert.alert('Đăng nhập thất bại', 'Email hoặc mật khẩu không đúng');
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Email hoặc mật khẩu không đúng';
+      Alert.alert('Đăng nhập thất bại', message);
     }
   };
 
+  const initialValues: LoginInput = {
+    email: '',
+    password: '',
+  };
+
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    <AuthLayout
+      title="Đăng nhập"
+      subtitle="Đăng nhập bằng email hoặc số điện thoại để tiếp tục."
+      contentContainerStyle={styles.content}
     >
-      <Text style={styles.title}>Đăng nhập</Text>
+      {/* Tab Switcher */}
+      <AuthTabSwitcher
+        tabs={[
+          { id: 'phone', label: 'Số điện thoại' },
+          { id: 'email', label: 'Email' },
+        ]}
+        activeTab={authMethod}
+        onTabChange={(tab) => setAuthMethod(tab as AuthMethod)}
+      />
 
       <Formik
-        initialValues={{ email: '', password: '' }}
+        initialValues={initialValues}
         validationSchema={toFormikValidationSchema(LoginSchema)}
         onSubmit={handleSubmit}
       >
-        {({ handleChange, handleBlur, handleSubmit, values, errors, touched, isSubmitting }) => (
+        {({
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          values,
+          errors,
+          touched,
+          isSubmitting,
+        }) => (
           <View style={styles.form}>
-            <View style={styles.field}>
-              <TextInput
-                style={[styles.input, touched.email && errors.email ? styles.inputError : null]}
-                placeholder="Email"
+            {/* Email Input */}
+            {authMethod === 'email' ? (
+              <Input
+                label="Email"
+                placeholder="example@email.com"
                 keyboardType="email-address"
                 autoCapitalize="none"
                 value={values.email}
                 onChangeText={handleChange('email')}
-                onBlur={handleBlur('email')}
+                onBlur={() => handleBlur('email')}
+                error={
+                  touched.email && errors.email ? errors.email : undefined
+                }
               />
-              {touched.email && errors.email && <Text style={styles.error}>{errors.email}</Text>}
-            </View>
-
-            <View style={styles.field}>
-              <TextInput
-                style={[
-                  styles.input,
-                  touched.password && errors.password ? styles.inputError : null,
-                ]}
-                placeholder="Mật khẩu"
-                secureTextEntry
-                value={values.password}
-                onChangeText={handleChange('password')}
-                onBlur={handleBlur('password')}
+            ) : (
+              <PhoneInput
+                label="SỐ ĐIỆN THOẠI"
+                placeholder="912 345 678"
+                value={values.email}
+                onChangeText={handleChange('email')}
+                onBlur={() => handleBlur('email')}
+                error={
+                  touched.email && errors.email ? errors.email : undefined
+                }
               />
-              {touched.password && errors.password && (
-                <Text style={styles.error}>{errors.password}</Text>
-              )}
-            </View>
+            )}
 
-            <Link href="/forgot-password" style={styles.link}>
-              Quên mật khẩu?
+            {/* Password */}
+            <Input
+              label="MẬT KHẨU"
+              placeholder="Tối thiểu 8 ký tự"
+              isPassword
+              value={values.password}
+              onChangeText={handleChange('password')}
+              onBlur={handleBlur('password')}
+              error={
+                touched.password && errors.password
+                  ? errors.password
+                  : undefined
+              }
+            />
+
+            {/* Forgot Password Link */}
+            <Link href="/forgot-password" asChild>
+              <TouchableOpacity style={styles.forgotLink}>
+                <Text style={styles.forgotLinkText}>Quên mật khẩu?</Text>
+              </TouchableOpacity>
             </Link>
 
-            <TouchableOpacity
-              style={[styles.button, isSubmitting && styles.buttonDisabled]}
+            {/* Submit Button */}
+            <Button
+              label="Đăng nhập"
               onPress={() => handleSubmit()}
               disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={styles.buttonText}>Đăng nhập</Text>
-              )}
-            </TouchableOpacity>
+              loading={isSubmitting}
+              style={styles.button}
+            />
 
+            {/* Social Login */}
+            <SocialLoginButtons
+              onPress={(provider) =>
+                Alert.alert(
+                  `${provider} Sign In chưa được triển khai`
+                )
+              }
+              containerStyle={styles.socialSection}
+            />
+
+            {/* Register Link */}
             <View style={styles.footer}>
-              <Text>Chưa có tài khoản? </Text>
-              <Link href="/register" style={styles.link}>
-                Đăng ký
+              <Text style={styles.footerText}>Chưa có tài khoản? </Text>
+              <Link href="/register" asChild>
+                <TouchableOpacity>
+                  <Text style={styles.footerLink}>Đăng ký ngay</Text>
+                </TouchableOpacity>
               </Link>
             </View>
           </View>
         )}
       </Formik>
-    </KeyboardAvoidingView>
+    </AuthLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 24, backgroundColor: '#fff' },
-  title: { fontSize: 28, fontWeight: 'bold', marginBottom: 32, color: '#1a1a1a' },
-  form: { gap: 16 },
-  field: { gap: 4 },
-  input: {
-    borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: '#f9fafb',
+  content: { marginBottom: Spacing.xl },
+  form: { gap: Spacing.lg },
+
+  /* Forgot Password */
+  forgotLink: { alignSelf: 'flex-end', paddingVertical: Spacing.sm },
+  forgotLinkText: {
+    fontSize: FontSize.body,
+    color: Palette.orange,
+    fontWeight: '600',
   },
-  inputError: { borderColor: '#ef4444' },
-  error: { fontSize: 12, color: '#ef4444' },
-  button: {
-    backgroundColor: '#2563eb',
-    borderRadius: 8,
-    padding: 14,
-    alignItems: 'center',
-    marginTop: 8,
+
+  /* Button */
+  button: { marginTop: Spacing.md },
+
+  /* Social Section */
+  socialSection: {
+    marginVertical: Spacing.lg,
   },
-  buttonDisabled: { opacity: 0.6 },
-  buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
-  footer: { flexDirection: 'row', justifyContent: 'center', marginTop: 8 },
-  link: { color: '#2563eb', fontWeight: '500' },
+
+  /* Footer */
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: Spacing.xs,
+    marginTop: Spacing.lg,
+  },
+  footerText: { fontSize: FontSize.body, color: Palette.textSecondary },
+  footerLink: {
+    fontSize: FontSize.body,
+    color: Palette.orange,
+    fontWeight: '600',
+  },
 });

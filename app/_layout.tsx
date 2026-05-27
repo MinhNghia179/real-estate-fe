@@ -18,11 +18,8 @@ import { useAuthStore } from '@stores/authStore';
 import { queryClient } from '@config/queryClient';
 
 export const unstable_settings = {
-  anchor: '(tabs)',
+  anchor: 'welcome',
 };
-
-// TODO: remove when Firebase credentials are configured
-const BYPASS_AUTH = true;
 
 function AuthGate() {
   const { setUser, isLoading } = useAuthStore();
@@ -34,7 +31,7 @@ function AuthGate() {
     const unsubscribe = authService.onAuthStateChanged((user) => {
       setUser(user);
       if (!isLoading) {
-        router.replace(user ? '/(tabs)' : '/login');
+        router.replace(user ? '/(tabs)' : '/welcome');
       }
     });
     return unsubscribe;
@@ -49,8 +46,9 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        {!BYPASS_AUTH && <AuthGate />}
+        <AuthGate />
         <Stack>
+          <Stack.Screen name="welcome" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="login" options={{ headerShown: false }} />
           <Stack.Screen name="register" options={{ headerShown: false }} />

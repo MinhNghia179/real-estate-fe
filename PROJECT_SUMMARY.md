@@ -3,8 +3,9 @@
 ## 🎯 Current Status: MVP Phase 1 ✅
 
 **Created Date:** May 25, 2026  
-**Framework:** React Native + Expo  
-**Backend:** Firebase  
+**Frontend Framework:** React Native + Expo  
+**Backend Framework:** Node.js  
+**Backend Database:** Firebase (Firestore, Realtime DB, Auth)  
 **Language:** TypeScript
 
 ---
@@ -57,14 +58,15 @@
 ### 📚 Documentation
 
 - ✅ README.md - Project overview
-- ✅ SETUP.md - Architecture & setup
+- ✅ PROJECT_SUMMARY.md - This file (Architecture & setup)
 - ✅ FIREBASE_SETUP.md - Step-by-step Firebase guide
 - ✅ QUICKSTART.md - Quick start in 5 minutes
-- ✅ This file - Project summary
 
 ---
 
 ## 📁 Project Structure
+
+### Frontend (React Native + Expo)
 
 ```
 src/
@@ -117,18 +119,49 @@ Configuration:
 ├── .prettierrc
 ├── .gitignore
 └── .env.example
+```
 
-Documentation:
-├── README.md
-├── SETUP.md
-├── FIREBASE_SETUP.md
-├── QUICKSTART.md
-└── PROJECT_SUMMARY.md (this file)
+### Backend (Node.js) - Separate Repository
+
+```
+backend/
+├── src/
+│   ├── api/
+│   │   ├── routes/              (API endpoints)
+│   │   ├── controllers/         (Request handlers)
+│   │   └── middleware/          (Auth, validation)
+│   ├── services/
+│   │   ├── propertyService.ts   (Business logic)
+│   │   ├── authService.ts       (Auth logic)
+│   │   └── chatService.ts       (Real-time chat)
+│   ├── models/
+│   │   └── types.ts             (TypeScript types)
+│   ├── config/
+│   │   ├── firebase.ts          (Firebase init)
+│   │   └── server.ts            (Server config)
+│   └── index.ts                 (Server entry)
+├── tests/                       (Unit & integration tests)
+├── package.json
+├── tsconfig.json
+├── .env.example
+└── README.md
+```
+
+### Documentation
+
+```
+├── README.md                    (Project overview)
+├── PROJECT_SUMMARY.md           (This file - Architecture & setup)
+├── FIREBASE_SETUP.md            (Firebase guide)
+├── QUICKSTART.md                (Quick start)
+└── AGENTS.md                    (Expo agent guidelines)
 ```
 
 ---
 
 ## 🚀 Tech Stack
+
+### Frontend (React Native + Expo)
 
 | Category         | Technology   | Version |
 | ---------------- | ------------ | ------- |
@@ -136,12 +169,23 @@ Documentation:
 | **Dev Platform** | Expo         | ~51.0.0 |
 | **Routing**      | Expo Router  | ^3.4.0  |
 | **Language**     | TypeScript   | ^5.0.0  |
-| **Backend**      | Firebase     | ^10.8.0 |
 | **State**        | Zustand      | ^4.4.7  |
 | **Validation**   | Zod          | ^3.22.4 |
 | **Testing**      | Jest         | ^29.5.0 |
 | **Linting**      | ESLint       | ^8.50.0 |
 | **Formatting**   | Prettier     | ^3.0.0  |
+
+### Backend (Node.js)
+
+| Category         | Technology   | Version |
+| ---------------- | ------------ | ------- |
+| **Runtime**      | Node.js      | 16.0.0+ |
+| **Language**     | TypeScript   | ^5.0.0  |
+| **Firebase SDK** | Firebase     | ^10.8.0 |
+| **Auth**         | Firebase Auth| ^10.8.0 |
+| **Database**     | Firestore    | ^10.8.0 |
+| **Realtime DB**  | Firebase RTDB| ^10.8.0 |
+| **Storage**      | Firebase Storage | ^10.8.0 |
 
 ---
 
@@ -322,7 +366,7 @@ npm run lint
 
 ### Documentation
 
-- [SETUP.md](./SETUP.md) - Architecture details
+- [PROJECT_SUMMARY.md](./PROJECT_SUMMARY.md) - Architecture details (this file)
 - [FIREBASE_SETUP.md](./FIREBASE_SETUP.md) - Firebase guide
 - [QUICKSTART.md](./QUICKSTART.md) - Quick start
 
@@ -338,7 +382,7 @@ npm run lint
 
 ## 🎓 Learning Path
 
-1. **Understand Architecture** - Read [SETUP.md](./SETUP.md)
+1. **Understand Architecture** - Read [PROJECT_SUMMARY.md](./PROJECT_SUMMARY.md) (this file)
 2. **Setup Firebase** - Follow [FIREBASE_SETUP.md](./FIREBASE_SETUP.md)
 3. **Run the App** - Follow [QUICKSTART.md](./QUICKSTART.md)
 4. **Test Auth Flow** - Login/register/logout
@@ -351,19 +395,35 @@ npm run lint
 
 ## 📝 Notes
 
+### Frontend
 - All code follows TypeScript strict mode
 - Immutability enforced throughout
 - Error handling is comprehensive
 - Input validation on all forms
 - Zustand for state management (not Redux)
-- Firestore for main database
-- Realtime Database for chat
-- Cloud Storage for images
+- Expo Router for file-based navigation
+- Component size max 400 lines
+
+### Backend (Node.js)
+- Separate Node.js server for API endpoints
+- Firebase SDK integration for all Firebase services
+- REST/GraphQL API for frontend communication
+- TypeScript strict mode enforced
+- Comprehensive error handling & validation
+- Business logic layer separate from API layer
+- Consider Express, Fastify, or other Node.js framework
+
+### Database & Services
+- Firestore for main database (properties, users)
+- Realtime Database for real-time chat
+- Cloud Storage for images & documents
+- Firebase Authentication for user management
 
 ---
 
 **Project Created:** May 25, 2026  
-**Last Updated:** May 25, 2026  
-**Status:** MVP Phase 1 Complete ✅
+**Last Updated:** May 27, 2026  
+**Status:** MVP Phase 1 Complete ✅  
+**Backend:** Node.js (Ready for development)
 
 Ready to start Phase 2? 🚀

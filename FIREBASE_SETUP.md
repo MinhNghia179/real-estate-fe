@@ -204,3 +204,22 @@ After Firebase setup:
 3. Test property creation (add test data)
 4. Test chat functionality
 5. Deploy to production with proper security rules
+
+## 🖥️ Backend (Node.js) Setup
+
+**Important:** The Node.js backend uses the **same Firebase project** as the frontend.
+
+The backend will:
+- Use the same Firebase credentials (API Key, Project ID, etc.)
+- Initialize Firebase SDK with the same configuration
+- Access Firestore, Realtime Database, Cloud Storage, and Authentication
+- Provide REST/GraphQL API endpoints for the frontend
+
+**Backend setup instructions:**
+- Create a separate Node.js server repository
+- Copy Firebase credentials to backend `.env`
+- Initialize Firebase Admin SDK (or regular SDK)
+- Create API endpoints that handle Firestore queries, auth, and storage operations
+- See backend README for detailed setup steps
+
+The frontend and backend share one Firebase project for seamless integration.

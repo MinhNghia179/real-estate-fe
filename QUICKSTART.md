@@ -205,7 +205,7 @@ npm start -- --clear
 
 ## Support
 
-- Check [SETUP.md](./SETUP.md) for architecture
+- Check [PROJECT_SUMMARY.md](./PROJECT_SUMMARY.md) for architecture
 - Check [FIREBASE_SETUP.md](./FIREBASE_SETUP.md) for Firebase guide
 - Check error messages in Expo CLI
 - Use React Native Debugger for advanced debugging

@@ -90,6 +90,10 @@ export const CreateReviewSchema = z.object({
   comment: z.string().min(10, { message: 'Nhận xét tối thiểu 10 ký tự' }).max(500),
 });
 
+export const OTPSchema = z.object({
+  otp: z.string().length(6, { message: 'OTP phải có 6 chữ số' }).regex(/^[0-9]{6}$/, { message: 'OTP chỉ chứa số' }),
+});
+
 export type LoginInput = z.infer<typeof LoginSchema>;
 export type RegisterInput = z.infer<typeof RegisterSchema>;
 export type ForgotPasswordInput = z.infer<typeof ForgotPasswordSchema>;
@@ -98,3 +102,4 @@ export type CreatePropertyInput = z.infer<typeof CreatePropertySchema>;
 export type SearchPropertyInput = z.infer<typeof SearchPropertySchema>;
 export type SendMessageInput = z.infer<typeof SendMessageSchema>;
 export type CreateReviewInput = z.infer<typeof CreateReviewSchema>;
+export type OTPInput = z.infer<typeof OTPSchema>;

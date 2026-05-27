@@ -1,40 +1,51 @@
+import { Ionicons } from '@expo/vector-icons';
 import { Formik } from 'formik';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 
-import React from 'react';
+import React, { useState } from 'react';
 
-import {
-  ActivityIndicator,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { Link, router } from 'expo-router';
 
-import { authService } from '@services/authService';
+import {
+  AuthLayout,
+  AuthTabSwitcher,
+  Button,
+  Input,
+  PhoneInput,
+  SocialLoginButtons,
+} from '@components/ui';
+import { FontSize, Palette, Spacing } from '@constants/theme';
 
+import { authService } from '@services/authService';
 import { useAuthStore } from '@stores/authStore';
 
-import { RegisterSchema } from '@schemas';
 import type { RegisterInput } from '@schemas';
+import { RegisterSchema } from '@schemas';
+
+type AuthMethod = 'phone' | 'email';
 
 export default function RegisterScreen() {
+  const [authMethod, setAuthMethod] = useState<AuthMethod>('phone');
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const setUser = useAuthStore((s) => s.setUser);
 
   const handleSubmit = async (values: RegisterInput) => {
+    if (!agreedToTerms) {
+      Alert.alert('Lỗi', 'Bạn phải đồng ý với Điều khoản dịch vụ');
+      return;
+    }
+
     try {
       const user = await authService.signUp(values);
       setUser(user);
-      router.replace('/(tabs)');
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Đăng ký thất bại';
+      router.push({
+        pathname: '/verify-otp',
+        params: { email: user.email, purpose: 'register' },
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Đăng ký thất bại';
       Alert.alert('Lỗi', message);
     }
   };
@@ -48,103 +59,196 @@ export default function RegisterScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    <AuthLayout
+      step="Bước 1 / 4"
+      title="Tạo tài khoản"
+      subtitle="Đăng ký bằng email hoặc số điện thoại để bắt đầu."
+      contentContainerStyle={styles.content}
     >
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Tạo tài khoản</Text>
+      {/* Tab Switcher */}
+      <AuthTabSwitcher
+        tabs={[
+          { id: 'phone', label: 'Số điện thoại' },
+          { id: 'email', label: 'Email' },
+        ]}
+        activeTab={authMethod}
+        onTabChange={(tab) => setAuthMethod(tab as AuthMethod)}
+      />
 
-        <Formik
-          initialValues={initialValues}
-          validationSchema={toFormikValidationSchema(RegisterSchema)}
-          onSubmit={handleSubmit}
-        >
-          {({ handleChange, handleBlur, handleSubmit, values, errors, touched, isSubmitting }) => (
-            <View style={styles.form}>
-              {(
-                [
-                  { key: 'name', placeholder: 'Họ và tên' },
-                  { key: 'email', placeholder: 'Email', keyboardType: 'email-address' as const },
-                  {
-                    key: 'phone',
-                    placeholder: 'Số điện thoại',
-                    keyboardType: 'phone-pad' as const,
-                  },
-                  { key: 'password', placeholder: 'Mật khẩu', secure: true },
-                  { key: 'confirmPassword', placeholder: 'Xác nhận mật khẩu', secure: true },
-                ] as Array<{
-                  key: keyof RegisterInput;
-                  placeholder: string;
-                  keyboardType?: 'email-address' | 'phone-pad';
-                  secure?: boolean;
-                }>
-              ).map(({ key, placeholder, keyboardType, secure }) => (
-                <View key={key} style={styles.field}>
-                  <TextInput
-                    style={[styles.input, touched[key] && errors[key] ? styles.inputError : null]}
-                    placeholder={placeholder}
-                    keyboardType={keyboardType}
-                    autoCapitalize="none"
-                    secureTextEntry={secure}
-                    value={values[key]}
-                    onChangeText={handleChange(key)}
-                    onBlur={handleBlur(key)}
-                  />
-                  {touched[key] && errors[key] && <Text style={styles.error}>{errors[key]}</Text>}
-                </View>
-              ))}
+      <Formik
+        initialValues={initialValues}
+        validationSchema={toFormikValidationSchema(RegisterSchema)}
+        onSubmit={handleSubmit}
+      >
+        {({
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          values,
+          errors,
+          touched,
+          isSubmitting,
+        }) => (
+          <View style={styles.form}>
+            {/* Phone or Email */}
+            {authMethod === 'phone' ? (
+              <PhoneInput
+                label="SỐ ĐIỆN THOẠI"
+                placeholder="912 345 678"
+                value={values.phone || ''}
+                onChangeText={handleChange('phone')}
+                onBlur={() => handleBlur('phone')}
+                error={
+                  touched.phone && errors.phone ? errors.phone : undefined
+                }
+              />
+            ) : (
+              <Input
+                label="Email"
+                placeholder="example@email.com"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                value={values.email}
+                onChangeText={handleChange('email')}
+                onBlur={handleBlur('email')}
+                error={
+                  touched.email && errors.email ? errors.email : undefined
+                }
+              />
+            )}
 
-              <TouchableOpacity
-                style={[styles.button, isSubmitting && styles.buttonDisabled]}
-                onPress={() => handleSubmit()}
-                disabled={isSubmitting}
+            {/* Password */}
+            <Input
+              label="MẬT KHẨU"
+              placeholder="Tối thiểu 8 ký tự"
+              isPassword
+              value={values.password}
+              onChangeText={handleChange('password')}
+              onBlur={() => handleBlur('password')}
+              error={
+                touched.password && errors.password
+                  ? errors.password
+                  : undefined
+              }
+            />
+
+            {/* Terms & Conditions */}
+            <TouchableOpacity
+              style={styles.checkboxContainer}
+              onPress={() => setAgreedToTerms(!agreedToTerms)}
+            >
+              <View
+                style={[
+                  styles.checkbox,
+                  agreedToTerms && styles.checkboxChecked,
+                ]}
               >
-                {isSubmitting ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <Text style={styles.buttonText}>Đăng ký</Text>
+                {agreedToTerms && (
+                  <Ionicons name="checkmark" size={16} color="#fff" />
                 )}
-              </TouchableOpacity>
-
-              <View style={styles.footer}>
-                <Text>Đã có tài khoản? </Text>
-                <Link href="/login" style={styles.link}>
-                  Đăng nhập
-                </Link>
               </View>
+              <View style={styles.termsTextContainer}>
+                <Text style={styles.termsMainText}>
+                  Tôi đồng ý với{' '}
+                  <Text style={styles.termsLink}>Điều khoản dịch vụ</Text>
+                  {' '}và{' '}
+                  <Text style={styles.termsLink}>Chính sách bảo mật</Text>
+                  {' '}của Đất Vàng.
+                </Text>
+              </View>
+            </TouchableOpacity>
+
+            {/* Submit Button */}
+            <Button
+              label="Tiếp tục"
+              onPress={() => handleSubmit()}
+              disabled={isSubmitting || !agreedToTerms}
+              loading={isSubmitting}
+              style={styles.button}
+            />
+
+            {/* Social Login */}
+            <SocialLoginButtons
+              onPress={(provider) =>
+                Alert.alert(
+                  `${provider} Sign In chưa được triển khai`
+                )
+              }
+              containerStyle={styles.socialSection}
+            />
+
+            {/* Login Link */}
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>Đã có tài khoản? </Text>
+              <Link href="/login" asChild>
+                <TouchableOpacity>
+                  <Text style={styles.footerLink}>Đăng nhập</Text>
+                </TouchableOpacity>
+              </Link>
             </View>
-          )}
-        </Formik>
-      </ScrollView>
-    </KeyboardAvoidingView>
+          </View>
+        )}
+      </Formik>
+    </AuthLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flexGrow: 1, justifyContent: 'center', padding: 24, backgroundColor: '#fff' },
-  title: { fontSize: 28, fontWeight: 'bold', marginBottom: 32, color: '#1a1a1a' },
-  form: { gap: 16 },
-  field: { gap: 4 },
-  input: {
-    borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: '#f9fafb',
+  content: { marginBottom: Spacing.xl },
+  form: { gap: Spacing.lg },
+
+  /* Checkbox */
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: Spacing.md,
   },
-  inputError: { borderColor: '#ef4444' },
-  error: { fontSize: 12, color: '#ef4444' },
-  button: {
-    backgroundColor: '#2563eb',
-    borderRadius: 8,
-    padding: 14,
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: Palette.orange,
+    backgroundColor: Palette.white,
     alignItems: 'center',
-    marginTop: 8,
+    justifyContent: 'center',
+    marginTop: Spacing.xs,
   },
-  buttonDisabled: { opacity: 0.6 },
-  buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
-  footer: { flexDirection: 'row', justifyContent: 'center', marginTop: 8 },
-  link: { color: '#2563eb', fontWeight: '500' },
+  checkboxChecked: {
+    backgroundColor: Palette.orange,
+  },
+  termsTextContainer: {
+    flex: 1,
+  },
+  termsMainText: {
+    fontSize: FontSize.caption,
+    color: Palette.textSecondary,
+    lineHeight: 18,
+  },
+  termsLink: {
+    color: Palette.orange,
+    fontWeight: '600',
+  },
+
+  /* Button */
+  button: { marginTop: Spacing.md },
+
+  /* Social Section */
+  socialSection: {
+    marginVertical: Spacing.lg,
+  },
+
+  /* Footer */
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: Spacing.xs,
+    marginTop: Spacing.lg,
+  },
+  footerText: { fontSize: FontSize.body, color: Palette.textSecondary },
+  footerLink: {
+    fontSize: FontSize.body,
+    color: Palette.orange,
+    fontWeight: '600',
+  },
 });

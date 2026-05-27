@@ -4,17 +4,25 @@ A modern mobile application for buying, selling, and renting real estate propert
 
 ## 🎯 Tech Stack
 
+### Frontend (React Native)
+
 | Component     | Technology                                          |
 | ------------- | --------------------------------------------------- |
 | **Framework** | React Native (Expo) - Single code for iOS + Android |
-| **Backend**   | Firebase Realtime Database                          |
-| **Storage**   | Firebase Cloud Storage - Images, documents          |
-| **Auth**      | Firebase Authentication - Email/password            |
-| **Chat**      | Firebase Realtime Database - Real-time messages     |
-| **Database**  | Firestore - Property data                           |
 | **Routing**   | Expo Router - File-based routing                    |
 | **Language**  | TypeScript                                          |
 | **State**     | React Hooks + Zustand ready                         |
+
+### Backend (Node.js)
+
+| Component     | Technology                                          |
+| ------------- | --------------------------------------------------- |
+| **Runtime**   | Node.js                                             |
+| **Auth**      | Firebase Authentication - Email/password            |
+| **Database**  | Firestore - Property data, user profiles            |
+| **Chat**      | Firebase Realtime Database - Real-time messages     |
+| **Storage**   | Firebase Cloud Storage - Images, documents          |
+| **API**       | REST/GraphQL endpoints for data operations          |
 
 ## 📱 Platforms
 
@@ -52,7 +60,7 @@ npm run android
 
 ## 📁 Project Structure
 
-See [SETUP.md](./SETUP.md) for detailed folder structure and architecture.
+See [PROJECT_SUMMARY.md](./PROJECT_SUMMARY.md) for detailed folder structure and architecture.
 
 ## 🎨 Key Features
 
@@ -110,21 +118,47 @@ npm run type-check # TypeScript validation
 ## 📋 Architecture
 
 ```
-User Interface (Expo Router, React Components)
-           ↓
-Business Logic (Custom Hooks)
-           ↓
-Services (Firebase, API Calls)
-           ↓
-Firebase Backend
+┌─────────────────────────────────────────┐
+│   Frontend (React Native + Expo)        │
+│   ├── User Interface Components         │
+│   ├── Expo Router Navigation            │
+│   ├── Custom Hooks (Business Logic)     │
+│   ├── Zustand Store (State Management)  │
+│   └── Services (API & Firebase SDK)     │
+└────────────┬────────────────────────────┘
+             │
+             │ REST/GraphQL API Calls
+             │
+┌────────────▼────────────────────────────┐
+│   Backend (Node.js Server)              │
+│   ├── Express/Fastify Server            │
+│   ├── REST/GraphQL API Endpoints        │
+│   ├── Business Logic Layer              │
+│   └── Firebase SDK Integration          │
+└────────────┬────────────────────────────┘
+             │
+┌────────────▼────────────────────────────┐
+│   Firebase Services                     │
+│   ├── Firestore Database                │
+│   ├── Realtime Database (Chat)          │
+│   ├── Cloud Storage (Images/Docs)       │
+│   └── Authentication Service            │
+└─────────────────────────────────────────┘
 ```
 
-### Layers
+### Frontend Layers
 
 1. **UI Layer** - Components and screens
 2. **Hook Layer** - Business logic & state
-3. **Service Layer** - Firebase & API operations
+3. **Service Layer** - API calls & Firebase SDK
 4. **Config Layer** - Firebase setup & constants
+
+### Backend Layers
+
+1. **API Layer** - REST/GraphQL endpoints
+2. **Business Logic Layer** - Data processing & validation
+3. **Firebase Service Layer** - Firebase operations
+4. **Config Layer** - Firebase setup & environment
 
 ## 🔐 Firebase Setup
 
@@ -146,7 +180,8 @@ npm run test:coverage    # Coverage report
 
 ## 📚 Documentation
 
-- **[Setup Guide](./SETUP.md)** - Detailed setup and architecture
+- **[Project Summary](./PROJECT_SUMMARY.md)** - Architecture, structure, and setup
+- **[Firebase Setup](./FIREBASE_SETUP.md)** - Step-by-step Firebase guide
 - **[Firebase Docs](https://firebase.google.com/docs)**
 - **[Expo Docs](https://docs.expo.dev)**
 - **[React Native Docs](https://reactnative.dev)**
@@ -216,7 +251,7 @@ eas submit
 
 ## 📞 Support
 
-- Check [SETUP.md](./SETUP.md)
+- Check [PROJECT_SUMMARY.md](./PROJECT_SUMMARY.md) for architecture
 - Review error logs in Expo CLI
 - Check Firebase console
 - Use React Native Debugger

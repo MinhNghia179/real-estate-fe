@@ -5,7 +5,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { FontSize, FontWeight, Palette, Radius, Spacing } from '@constants/theme';
 
 interface StepSelectorProps {
-  options: Array<string | number>;
+  options: (string | number)[];
   value: string | number;
   onChange: (val: string | number) => void;
 }

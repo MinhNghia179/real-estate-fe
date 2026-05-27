@@ -18,6 +18,7 @@ interface InputProps extends TextInputProps {
   label?: string;
   error?: string;
   prefix?: React.ReactNode;
+  icon?: keyof typeof Ionicons.glyphMap;
   containerStyle?: ViewStyle;
   isPassword?: boolean;
 }
@@ -26,6 +27,7 @@ export const Input = ({
   label,
   error,
   prefix,
+  icon,
   containerStyle,
   isPassword,
   style,
@@ -44,7 +46,18 @@ export const Input = ({
           !!error && styles.containerError,
         ]}
       >
-        {prefix && <View style={styles.prefix}>{prefix}</View>}
+        {(prefix || icon) && (
+          <View style={styles.prefix}>
+            {prefix}
+            {icon && !prefix && (
+              <Ionicons
+                name={icon}
+                size={20}
+                color={Palette.textMuted}
+              />
+            )}
+          </View>
+        )}
         <RNTextInput
           style={[styles.input, style]}
           placeholderTextColor={Palette.textMuted}
@@ -88,7 +101,13 @@ const styles = StyleSheet.create({
   },
   containerFocused: { borderColor: Palette.orange },
   containerError: { borderColor: Palette.badgeRed },
-  prefix: { paddingLeft: Spacing.md, paddingRight: Spacing.sm },
+  prefix: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingLeft: Spacing.md,
+    paddingRight: Spacing.sm,
+    gap: Spacing.xs,
+  },
   input: {
     flex: 1,
     paddingHorizontal: Spacing.md,

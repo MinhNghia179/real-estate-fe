@@ -94,6 +94,19 @@ export default function RegisterScreen() {
           <View style={styles.form}>
             {/* Inputs Section */}
             <View style={styles.inputsSection}>
+              {/* Name */}
+              <Input
+                label={t.auth.labels.fullName}
+                placeholder={t.auth.placeholders.fullName}
+                icon="person-outline"
+                value={values.name}
+                onChangeText={handleChange('name')}
+                onBlur={() => handleBlur('name')}
+                error={
+                  touched.name && errors.name ? errors.name : undefined
+                }
+              />
+
               {/* Phone or Email */}
               {authMethod === 'phone' ? (
                 <PhoneInput
@@ -110,6 +123,7 @@ export default function RegisterScreen() {
                 <Input
                   label={t.auth.labels.email}
                   placeholder={t.auth.placeholders.email}
+                  icon="mail-outline"
                   keyboardType="email-address"
                   autoCapitalize="none"
                   value={values.email}
@@ -125,6 +139,7 @@ export default function RegisterScreen() {
               <Input
                 label={t.auth.labels.password}
                 placeholder={t.auth.placeholders.password}
+                icon="lock-closed-outline"
                 isPassword
                 value={values.password}
                 onChangeText={handleChange('password')}

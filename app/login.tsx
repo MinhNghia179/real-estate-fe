@@ -88,6 +88,7 @@ export default function LoginScreen() {
                 <Input
                   label={t.auth.labels.email}
                   placeholder={t.login.emailPlaceholder}
+                  icon="mail-outline"
                   keyboardType="email-address"
                   autoCapitalize="none"
                   value={values.email}
@@ -114,6 +115,7 @@ export default function LoginScreen() {
               <Input
                 label={t.auth.labels.password}
                 placeholder={t.login.passwordPlaceholder}
+                icon="lock-closed-outline"
                 isPassword
                 value={values.password}
                 onChangeText={handleChange('password')}

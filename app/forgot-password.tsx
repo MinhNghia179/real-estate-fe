@@ -22,13 +22,13 @@ export default function ForgotPasswordScreen() {
     try {
       await authService.resetPassword(values.email);
       Alert.alert(
+        'Đã gửi email',
         t.forgotPassword.success,
-        t.forgotPassword.subtitle,
         [{ text: 'OK', onPress: () => router.back() }]
       );
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : t.forgotPassword.errors.sendFailed;
+        error instanceof Error ? error.message : 'Không thể gửi email';
       Alert.alert('Lỗi', message);
     }
   };
@@ -58,6 +58,7 @@ export default function ForgotPasswordScreen() {
               <Input
                 label={t.auth.labels.email}
                 placeholder={t.auth.placeholders.email}
+                icon="mail-outline"
                 keyboardType="email-address"
                 autoCapitalize="none"
                 value={values.email}

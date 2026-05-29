@@ -1,68 +1,54 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useLocale } from '@contexts/locale-context';
 
-import {
-  Alert,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import React, { useEffect, useState } from 'react';
+
+import { Alert, Pressable, StyleSheet } from 'react-native';
 
 import { router, useLocalSearchParams } from 'expo-router';
 
-import { AuthLayout, Button } from '@components/ui';
-import { FontSize, Palette, Spacing } from '@constants/theme';
-import { useLocale } from '@contexts/locale-context';
+import { AuthLayout, Button, OTPInput } from '@components/ui';
+
+import { ThemedText, ThemedView } from "@components/ui";
+import { FontSize, FontWeight, Palette } from '@constants/theme';
 
 const OTP_LENGTH = 6;
 
 export default function VerifyOTPScreen() {
   const { t } = useLocale();
-  const { email, purpose } = useLocalSearchParams<{
-    email: string;
+  const { phone, purpose } = useLocalSearchParams<{
+    phone?: string;
     purpose?: string;
   }>();
   const [otp, setOtp] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [resendCount, setResendCount] = useState(0);
   const [timeLeft, setTimeLeft] = useState(60);
   const [canResend, setCanResend] = useState(false);
-  const inputRef = useRef<TextInput>(null);
+  const [resetKey, setResetKey] = useState(0);
 
   useEffect(() => {
     if (timeLeft <= 0) {
       setCanResend(true);
       return;
     }
-
-    const timer = setTimeout(() => {
-      setTimeLeft(timeLeft - 1);
-    }, 1000);
-
+    const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
     return () => clearTimeout(timer);
   }, [timeLeft]);
 
-  const handleOTPChange = (text: string) => {
-    const cleaned = text.replace(/[^0-9]/g, '').slice(0, OTP_LENGTH);
-    setOtp(cleaned);
-
-    if (cleaned.length === OTP_LENGTH) {
-      handleVerifyOTP(cleaned);
-    }
+  const handleOTPFilled = async (code: string) => {
+    await handleVerifyOTP(code);
   };
 
   const handleVerifyOTP = async (code: string = otp) => {
     if (code.length !== OTP_LENGTH) {
-      Alert.alert('Lỗi', t.verifyOtp.errors.invalidOtp);
+      Alert.alert(t.verifyOtp.errors.verifyFailed, t.verifyOtp.errors.invalidOtp);
       return;
     }
 
     try {
       setIsLoading(true);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      Alert.alert('Thành công', t.verifyOtp.subtitle, [
+      Alert.alert('✓ Success', 'OTP verified successfully', [
         {
           text: 'OK',
           onPress: () => {
@@ -75,9 +61,8 @@ export default function VerifyOTPScreen() {
         },
       ]);
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : t.verifyOtp.errors.verifyFailed;
-      Alert.alert('Lỗi', message);
+      const message = error instanceof Error ? error.message : t.verifyOtp.errors.verifyFailed;
+      Alert.alert('Error', message);
     } finally {
       setIsLoading(false);
     }
@@ -86,232 +71,175 @@ export default function VerifyOTPScreen() {
   const handleResendOTP = async () => {
     try {
       setIsLoading(true);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      Alert.alert(
-        'Thành công',
-        'Mã OTP mới đã được gửi đến điện thoại của bạn'
-      );
-      setResendCount((c) => c + 1);
       setOtp('');
+      setResetKey((prev) => prev + 1);
       setTimeLeft(60);
       setCanResend(false);
-      inputRef.current?.focus();
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Gửi lại thất bại';
-      Alert.alert('Lỗi', message);
+
+      Alert.alert('✓ Success', 'A new OTP code has been sent to your phone');
+    } catch {
+      Alert.alert('Error', 'Failed to resend OTP');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleChangePhone = () => {
-    Alert.alert('Thay đổi số', 'Tính năng này sẽ được cập nhật');
+    router.back();
   };
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs
-      .toString()
-      .padStart(2, '0')}`;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
+
+  const maskedPhone = phone ? `+84 ${phone.slice(-3)}` : '';
 
   return (
     <AuthLayout
-      step="Bước 2 / 4"
+      step={t.verifyOtp.step}
       title={t.verifyOtp.title}
-      subtitle={
-        email
-          ? `${t.verifyOtp.subtitle} ${email}`
-          : t.verifyOtp.subtitle
-      }
-      contentContainerStyle={styles.content}
+      subtitle={`${t.verifyOtp.subtitle} ${maskedPhone}`}
+      contentContainerStyle={{ marginBottom: 0 }}
     >
-      <View style={styles.form}>
-        {/* OTP Input Boxes */}
-        <View style={styles.otpSection}>
-          <TextInput
-            ref={inputRef}
-            style={styles.hiddenInput}
-            value={otp}
-            onChangeText={handleOTPChange}
-            keyboardType="numeric"
-            maxLength={OTP_LENGTH}
-            autoFocus
+      <ThemedView style={styles.mainContainer}>
+        {/* OTP Input Component */}
+        <ThemedView style={styles.otpContainer}>
+          <OTPInput
+            key={resetKey}
+            numberOfDigits={OTP_LENGTH}
+            onTextChange={setOtp}
+            onFilled={handleOTPFilled}
           />
-
-          <View style={styles.otpBoxesContainer}>
-            {Array.from({ length: OTP_LENGTH }).map((_, index) => (
-              <View
-                key={index}
-                style={[
-                  styles.otpBox,
-                  index < otp.length && styles.otpBoxFilled,
-                  index === otp.length && styles.otpBoxActive,
-                ]}
-              >
-                <Text style={styles.otpBoxText}>{otp[index] || ''}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
+        </ThemedView>
 
         {/* Resend Section */}
-        <View style={styles.resendSection}>
-          <View style={styles.resendTextContainer}>
-            <Text style={styles.resendLabel}>Chưa nhận được mã?</Text>
-            {canResend ? (
-              <TouchableOpacity onPress={handleResendOTP} disabled={isLoading}>
-                <Text style={styles.resendLink}>{t.verifyOtp.resendButton}</Text>
-              </TouchableOpacity>
-            ) : (
-              <Text style={styles.resendTimer}>
-                {t.verifyOtp.resendIn}{formatTime(timeLeft)}
-              </Text>
-            )}
-          </View>
-        </View>
+        <ThemedView style={styles.resendSection}>
+          <ThemedText style={styles.resendText}>
+            {t.verifyOtp.didNotReceive}
+          </ThemedText>
+          {canResend ? (
+            <Pressable onPress={handleResendOTP} disabled={isLoading}>
+              <ThemedText style={styles.resendButton}>
+                {t.verifyOtp.resendButton}
+              </ThemedText>
+            </Pressable>
+          ) : (
+            <ThemedText style={styles.resendDisabledText}>
+              {t.verifyOtp.resendIn}
+              {formatTime(timeLeft)}
+            </ThemedText>
+          )}
+        </ThemedView>
 
-        {/* Error Message */}
-        {resendCount > 2 && (
-          <View style={styles.errorBox}>
-            <Text style={styles.errorBoxTitle}>⚠ Không nhận được tin nhắn?</Text>
-            <Text style={styles.errorBoxText}>
-              Thử nhận mã qua cuộc gọi tự động hoặc liên hệ hỗ trợ.
-            </Text>
-          </View>
-        )}
+        {/* Info Alert Box */}
+        <ThemedView style={styles.infoBanner}>
+          <ThemedText style={styles.infoIcon}>ℹ</ThemedText>
+          <ThemedView style={styles.infoBannerContent}>
+            <ThemedText style={styles.infoBannerTitle}>
+              {t.verifyOtp.infoTitle}
+            </ThemedText>
+            <ThemedText style={styles.infoBannerDescription}>
+              {t.verifyOtp.infoDesc}
+            </ThemedText>
+          </ThemedView>
+        </ThemedView>
 
-        {/* Submit Button */}
-        <View style={styles.buttonsSection}>
+        {/* Action Buttons */}
+        <ThemedView style={styles.actionButtonsContainer}>
           <Button
             label={t.verifyOtp.verifyButton}
             onPress={() => handleVerifyOTP()}
             disabled={isLoading || otp.length !== OTP_LENGTH}
             loading={isLoading}
-            style={styles.button}
+            fullWidth
           />
 
-          {/* Change Phone Link */}
-          <TouchableOpacity
+          <Pressable
             onPress={handleChangePhone}
             style={styles.changePhoneButton}
           >
-            <Text style={styles.changePhoneText}>Thay đổi số điện thoại</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+            <ThemedText style={styles.changePhoneText}>
+              {t.verifyOtp.changePhone}
+            </ThemedText>
+          </Pressable>
+        </ThemedView>
+      </ThemedView>
     </AuthLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { marginBottom: 0 },
-  form: {
+  mainContainer: {
     flex: 1,
     justifyContent: 'space-between',
-    gap: Spacing.lg,
+    gap: 20,
   },
-  buttonsSection: { gap: 0 },
-
-  /* OTP Section */
-  otpSection: {
-    alignItems: 'center',
-    marginBottom: Spacing.xxl,
+  otpContainer: {
+    marginBottom: 24,
   },
-  hiddenInput: {
-    position: 'absolute',
-    width: 0,
-    height: 0,
-    opacity: 0,
-  },
-  otpBoxesContainer: {
-    flexDirection: 'row',
-    gap: Spacing.md,
-    justifyContent: 'center',
-  },
-  otpBox: {
-    width: 52,
-    height: 52,
-    borderWidth: 2,
-    borderColor: Palette.border,
-    borderRadius: Spacing.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Palette.white,
-  },
-  otpBoxFilled: {
-    borderColor: Palette.orange,
-    backgroundColor: '#FFF5EE',
-  },
-  otpBoxActive: {
-    borderColor: Palette.orange,
-  },
-  otpBoxText: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: Palette.textPrimary,
-  },
-
-  /* Resend Section */
   resendSection: {
-    marginBottom: Spacing.xxl,
-  },
-  resendTextContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 32,
   },
-  resendLabel: {
+  resendText: {
     fontSize: FontSize.body,
     color: Palette.textSecondary,
   },
-  resendLink: {
+  resendButton: {
     fontSize: FontSize.body,
     color: Palette.orange,
-    fontWeight: '600',
+    fontWeight: FontWeight.semibold,
   },
-  resendTimer: {
+  resendDisabledText: {
     fontSize: FontSize.body,
     color: Palette.textMuted,
-    fontWeight: '600',
+    fontWeight: FontWeight.semibold,
   },
-
-  /* Error Box */
-  errorBox: {
-    backgroundColor: '#FEF2F2',
-    borderRadius: Spacing.md,
-    borderLeftWidth: 4,
-    borderLeftColor: Palette.badgeRed,
-    padding: Spacing.md,
-    marginBottom: Spacing.xl,
+  infoBanner: {
+    backgroundColor: '#FFFBEB',
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: Palette.orange,
+    paddingHorizontal: 12,
+    paddingVertical: 16,
+    marginBottom: 24,
+    marginTop: 20,
+    flexDirection: 'row',
+    gap: 12,
   },
-  errorBoxTitle: {
+  infoIcon: {
+    fontSize: 24,
+    color: Palette.orange,
+    fontWeight: FontWeight.semibold,
+  },
+  infoBannerContent: {
+    flex: 1,
+    gap: 4,
+  },
+  infoBannerTitle: {
     fontSize: FontSize.body,
-    fontWeight: '600',
-    color: Palette.badgeRed,
-    marginBottom: Spacing.xs,
+    color: Palette.orange,
+    fontWeight: FontWeight.semibold,
   },
-  errorBoxText: {
+  infoBannerDescription: {
     fontSize: FontSize.caption,
-    color: Palette.badgeRed,
-    lineHeight: 18,
+    color: Palette.orange,
+    lineHeight: 20,
   },
-
-  /* Button */
-  button: {
-    marginBottom: Spacing.lg,
-  },
-
-  /* Change Phone */
+  actionButtonsContainer: {},
   changePhoneButton: {
-    paddingVertical: Spacing.md,
+    paddingVertical: 12,
     alignItems: 'center',
   },
   changePhoneText: {
     fontSize: FontSize.body,
     color: Palette.textSecondary,
-    fontWeight: '500',
+    fontWeight: FontWeight.medium,
   },
 });

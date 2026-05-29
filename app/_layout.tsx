@@ -10,14 +10,13 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { QueryClientProvider } from '@tanstack/react-query';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { LocaleProvider } from '@/src/contexts/locale-context';
 
 import { authService } from '@services/authService';
 
 import { useAuthStore } from '@stores/authStore';
 
 import { queryClient } from '@config/queryClient';
-
-import { LocaleProvider } from '@/src/contexts/locale-context';
 
 export const unstable_settings = {
   anchor: 'welcome',
@@ -55,7 +54,10 @@ export default function RootLayout() {
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="login" options={{ headerShown: false }} />
             <Stack.Screen name="register" options={{ headerShown: false }} />
-            <Stack.Screen name="forgot-password" options={{ title: 'Quên mật khẩu' }} />
+            <Stack.Screen name="verify-otp" options={{ headerShown: false }} />
+            <Stack.Screen name="forgot-password" options={{ headerShown: false }} />
+            <Stack.Screen name="select-role" options={{ headerShown: false }} />
+            <Stack.Screen name="complete-profile" options={{ headerShown: false }} />
             <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
           </Stack>
           <StatusBar style="auto" />

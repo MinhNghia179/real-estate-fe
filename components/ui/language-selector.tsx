@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
-import { Pressable, View, StyleSheet } from 'react-native';
-import { Text } from '@/components/text';
-import { languages } from '@locales';
 import { useLocale } from '@contexts/locale-context';
+import { languages } from '@locales';
+
+import React, { useState } from 'react';
+
+import { Pressable, StyleSheet, View } from 'react-native';
+
+import { Text } from '@/components/text';
 import { Palette } from '@/constants/theme';
 
 export function LanguageSelector() {
@@ -28,10 +31,7 @@ export function LanguageSelector() {
           {languages.map((lang: { code: 'en' | 'vi'; label: string; flag: string }) => (
             <Pressable
               key={lang.code}
-              style={[
-                styles.option,
-                language === lang.code && styles.optionActive,
-              ]}
+              style={[styles.option, language === lang.code && styles.optionActive]}
               onPress={async () => {
                 await setLanguage(lang.code);
                 setIsOpen(false);
@@ -40,10 +40,7 @@ export function LanguageSelector() {
               <Text style={styles.optionFlag}>{lang.flag}</Text>
               <View style={styles.optionTextContainer}>
                 <Text
-                  style={[
-                    styles.optionLabel,
-                    language === lang.code && styles.optionLabelActive,
-                  ]}
+                  style={[styles.optionLabel, language === lang.code && styles.optionLabelActive]}
                 >
                   {lang.label}
                 </Text>

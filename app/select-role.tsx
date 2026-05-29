@@ -1,13 +1,24 @@
-import { router } from 'expo-router';
-import React, { useState } from 'react';
-
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-
-import { AuthLayout, Button } from '@components/ui';
-import { FontSize, Palette, Spacing } from '@constants/theme';
 import { useLocale } from '@contexts/locale-context';
 
+import React, { useState } from 'react';
+
+import { Alert, Pressable, StyleSheet } from 'react-native';
+
+import { Image } from 'expo-image';
+import { ThemedText, ThemedView } from "@components/ui";
+import { router } from 'expo-router';
+
+import { AuthLayout, Button } from '@components/ui';
+
+import { FontSize, FontWeight, Palette, Spacing } from '@constants/theme';
+
 type RoleType = 'buyer' | 'broker' | null;
+
+const ICONS = {
+  buyer: require('@/assets/icons/icon-role-buyer.svg'),
+  broker: require('@/assets/icons/icon-role-broker.svg'),
+};
+import { ThemedText, ThemedView } from "@components/ui";
 
 export default function SelectRoleScreen() {
   const { t } = useLocale();
@@ -15,7 +26,7 @@ export default function SelectRoleScreen() {
 
   const handleContinue = () => {
     if (!selectedRole) {
-      Alert.alert('Lỗi', 'Vui lòng chọn vai trò');
+      Alert.alert(t.selectRole.title, 'Please select a role');
       return;
     }
 
@@ -25,183 +36,163 @@ export default function SelectRoleScreen() {
     });
   };
 
-  const RoleCard = ({
-    id,
-    emoji,
-    title,
-    description,
-  }: {
-    id: RoleType;
-    emoji: string;
-    title: string;
-    description: string;
-  }) => (
-    <TouchableOpacity
-      style={[
-        styles.roleCard,
-        selectedRole === id && styles.roleCardSelected,
-      ]}
-      onPress={() => setSelectedRole(id)}
-    >
-      <View style={styles.roleCardContent}>
-        <View
-          style={[
-            styles.roleIcon,
-            selectedRole === id && styles.roleIconSelected,
-          ]}
-        >
-          <Text style={styles.roleIconText}>{emoji}</Text>
-        </View>
-        <Text style={styles.roleTitle}>{title}</Text>
-        <Text style={styles.roleDescription}>{description}</Text>
-      </View>
-      {selectedRole === id && (
-        <View style={styles.checkmark}>
-          <Text style={styles.checkmarkText}>✓</Text>
-        </View>
-      )}
-    </TouchableOpacity>
-  );
+  const RoleCard = ({ id }: { id: 'buyer' | 'broker' }) => {
+    const isSelected = selectedRole === id;
+    const badges = id === 'buyer' ? t.selectRole.buyerBadges : t.selectRole.brokerBadges;
+    const title = id === 'buyer' ? t.selectRole.buyer : t.selectRole.broker;
+    const desc = id === 'buyer' ? t.selectRole.buyerDesc : t.selectRole.brokerDesc;
+
+    return (
+      <Pressable
+        style={[styles.card, isSelected ? styles.cardSelected : styles.cardUnselected]}
+        onPress={() => setSelectedRole(id)}
+      >
+        <ThemedView style={styles.iconContainer}>
+          <Image source={ICONS[id]} style={[styles.icon, { opacity: isSelected ? 1 : 0.7 }]} />
+        </ThemedView>
+
+        {/* Content */}
+        <ThemedView style={styles.contentContainer}>
+          <ThemedText style={styles.cardTitle}>{title}</ThemedText>
+          <ThemedText style={styles.cardDescription}>{desc}</ThemedText>
+
+          {/* Badges */}
+          <ThemedView style={styles.badgesRow}>
+            {badges.map((badge) => (
+              <ThemedView key={badge} style={styles.badgeContainer}>
+                <ThemedText style={styles.badgeText}>{badge}</ThemedText>
+              </ThemedView>
+            ))}
+          </ThemedView>
+        </ThemedView>
+
+        {/* Checkmark - Top Right Corner */}
+        {isSelected && (
+          <ThemedView style={styles.checkmark}>
+            <ThemedText style={styles.checkmarkText}>✓</ThemedText>
+          </ThemedView>
+        )}
+      </Pressable>
+    );
+  };
 
   return (
-    <AuthLayout
-      step="Bước 3 / 4"
-      title={t.selectRole.title}
-      subtitle={t.selectRole.subtitle}
-      contentContainerStyle={styles.content}
-    >
-      <View style={styles.form}>
-        <View style={styles.rolesContainer}>
-          <RoleCard
-            id="buyer"
-            emoji="🏠"
-            title={t.selectRole.buyer}
-            description={t.selectRole.buyerDesc}
-          />
-          <RoleCard
-            id="broker"
-            emoji="💼"
-            title={t.selectRole.broker}
-            description={t.selectRole.brokerDesc}
-          />
-        </View>
+    <AuthLayout step="Step 3 / 4" title={t.selectRole.title} subtitle={t.selectRole.subtitle}>
+      <ThemedView style={styles.mainContainer}>
+        {/* Role Cards */}
+        <ThemedView style={styles.cardsSection}>
+          <ThemedView style={styles.cardWrapper}>
+            <RoleCard id="buyer" />
+            <RoleCard id="broker" />
+          </ThemedView>
 
-        <View style={styles.buttonsSection}>
-          <Button
-            label={t.selectRole.continueButton}
-            onPress={handleContinue}
-            disabled={!selectedRole}
-            style={styles.button}
-          />
+          {/* Info Banner */}
+          <ThemedView style={styles.infoBanner}>
+            <ThemedText style={styles.infoBannerText}>ℹ {t.selectRole.infoBanner}</ThemedText>
+          </ThemedView>
+        </ThemedView>
 
-          <TouchableOpacity
-            onPress={() => router.replace('/(tabs)')}
-            style={styles.skipButton}
-          >
-            <Text style={styles.skipText}>Bỏ qua bước này</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+        {/* Continue Button */}
+        <Button
+          label={t.selectRole.continueButton}
+          onPress={handleContinue}
+          disabled={!selectedRole}
+          fullWidth
+        />
+      </ThemedView>
     </AuthLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { marginBottom: 0 },
-  form: {
+  mainContainer: {
     flex: 1,
     justifyContent: 'space-between',
-    gap: Spacing.lg,
+    gap: Spacing.xl,
   },
-  buttonsSection: { gap: 0 },
-
-  /* Roles Container */
-  rolesContainer: {
-    gap: Spacing.lg,
-    marginBottom: 0,
+  cardsSection: {
+    gap: Spacing.base,
   },
-
-  /* Role Card */
-  roleCard: {
+  cardWrapper: {
+    gap: Spacing.base,
+  },
+  card: {
     borderWidth: 2,
-    borderColor: Palette.border,
     borderRadius: Spacing.lg,
-    padding: Spacing.lg,
-    backgroundColor: Palette.white,
+    padding: Spacing.base,
+    flexDirection: 'row',
+    gap: Spacing.base,
     position: 'relative',
   },
-  roleCardSelected: {
+  cardSelected: {
     borderColor: Palette.orange,
-    backgroundColor: '#FFF5EE',
+    backgroundColor: '#FFFBEB',
   },
-
-  roleCardContent: {
-    alignItems: 'center',
+  cardUnselected: {
+    borderColor: Palette.border,
+    backgroundColor: Palette.white,
   },
-
-  /* Role Icon */
-  roleIcon: {
-    width: 80,
-    height: 80,
-    borderRadius: 16,
-    backgroundColor: '#F3F4F6',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: Spacing.lg,
+  iconContainer: {
+    flexShrink: 0,
   },
-  roleIconSelected: {
-    backgroundColor: Palette.orange,
+  icon: {
+    width: 56,
+    height: 56,
   },
-  roleIconText: {
-    fontSize: 40,
+  contentContainer: {
+    flex: 1,
+    gap: Spacing.sm,
   },
-
-  /* Role Title & Description */
-  roleTitle: {
+  cardTitle: {
     fontSize: FontSize.h3,
-    fontWeight: '600',
+    fontWeight: FontWeight.bold,
     color: Palette.textPrimary,
-    marginBottom: Spacing.sm,
-    textAlign: 'center',
   },
-  roleDescription: {
+  cardDescription: {
     fontSize: FontSize.body,
     color: Palette.textSecondary,
-    textAlign: 'center',
-    lineHeight: 20,
   },
-
-  /* Checkmark */
+  badgesRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.sm,
+    marginTop: Spacing.sm,
+  },
+  badgeContainer: {
+    backgroundColor: '#FEF3C7',
+    borderRadius: Spacing.sm,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+  },
+  badgeText: {
+    fontSize: FontSize.caption,
+    color: Palette.orange,
+    fontWeight: FontWeight.semibold,
+  },
   checkmark: {
     position: 'absolute',
-    top: Spacing.md,
-    right: Spacing.md,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    top: 12,
+    right: 12,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     backgroundColor: Palette.orange,
     alignItems: 'center',
     justifyContent: 'center',
   },
   checkmarkText: {
-    fontSize: 18,
     color: Palette.white,
-    fontWeight: '700',
+    fontWeight: FontWeight.bold,
+    fontSize: FontSize.body,
   },
-
-  /* Button */
-  button: {
-    marginBottom: Spacing.lg,
+  infoBanner: {
+    backgroundColor: Palette.divider,
+    borderRadius: Spacing.md,
+    padding: Spacing.base,
+    marginTop: Spacing.md,
   },
-
-  /* Skip Button */
-  skipButton: {
-    paddingVertical: Spacing.md,
-    alignItems: 'center',
-  },
-  skipText: {
+  infoBannerText: {
     fontSize: FontSize.body,
     color: Palette.textSecondary,
-    fontWeight: '500',
   },
 });

@@ -110,9 +110,9 @@ export default function CompleteProfileScreen() {
           touched,
           isSubmitting,
         }) => (
-          <View style={styles.form}>
+          <ThemedView style={styles.form}>
             {/* Avatar Section */}
-            <View style={styles.avatarSection}>
+            <ThemedView style={styles.avatarSection}>
               <TouchableOpacity
                 style={styles.avatarContainer}
                 onPress={handlePickAvatar}
@@ -123,16 +123,16 @@ export default function CompleteProfileScreen() {
                     style={styles.avatar}
                   />
                 ) : (
-                  <View style={styles.avatarPlaceholder}>
-                    <Text style={styles.avatarPlaceholderText}>📷</Text>
-                  </View>
+                  <ThemedView style={styles.avatarPlaceholder}>
+                    <ThemedText style={styles.avatarPlaceholderText}>📷</ThemedText>
+                  </ThemedView>
                 )}
-                <View style={styles.editBadge}>
-                  <Text style={styles.editBadgeText}>✏️</Text>
-                </View>
+                <ThemedView style={styles.editBadge}>
+                  <ThemedText style={styles.editBadgeText}>✏️</ThemedText>
+                </ThemedView>
               </TouchableOpacity>
-              <Text style={styles.avatarHint}>Chọn ảnh đại diện</Text>
-            </View>
+              <ThemedText style={styles.avatarHint}>Chọn ảnh đại diện</ThemedText>
+            </ThemedView>
 
             {/* Form Fields */}
             <Input
@@ -157,14 +157,14 @@ export default function CompleteProfileScreen() {
             />
 
             {/* Role Info */}
-            <View style={styles.roleInfo}>
-              <Text style={styles.roleLabel}>Vai trò đã chọn:</Text>
-              <Text style={styles.roleValue}>
+            <ThemedView style={styles.roleInfo}>
+              <ThemedText style={styles.roleLabel}>Vai trò đã chọn:</ThemedText>
+              <ThemedText style={styles.roleValue}>
                 {role === 'buyer'
                   ? '👤 Người mua / Thuê'
                   : '💼 Môi giới / Bán'}
-              </Text>
-            </View>
+              </ThemedText>
+            </ThemedView>
 
             {/* Submit Button */}
             <Button
@@ -180,9 +180,9 @@ export default function CompleteProfileScreen() {
               onPress={() => router.replace('/(tabs)')}
               style={styles.skipButton}
             >
-              <Text style={styles.skipText}>Bỏ qua và vào ứng dụng</Text>
+              <ThemedText style={styles.skipText}>Bỏ qua và vào ứng dụng</ThemedText>
             </TouchableOpacity>
-          </View>
+          </ThemedView>
         )}
       </Formik>
     </AuthLayout>

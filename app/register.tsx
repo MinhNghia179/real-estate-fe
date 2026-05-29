@@ -1,10 +1,11 @@
+import { useLocale } from '@contexts/locale-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Formik } from 'formik';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 
 import React, { useState } from 'react';
 
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Link, router } from 'expo-router';
 
@@ -16,14 +17,12 @@ import {
   PhoneInput,
   SocialLoginButtons,
 } from '@components/ui';
-import { FontSize, Palette, Spacing } from '@constants/theme';
 
-import { authService } from '@services/authService';
-import { useAuthStore } from '@stores/authStore';
-import { useLocale } from '@contexts/locale-context';
-
+import { ThemedText, ThemedView } from "@components/ui";
 import type { RegisterInput } from '@schemas';
 import { RegisterSchema } from '@schemas';
+
+import { FontSize, FontWeight, Palette, Spacing } from '@constants/theme';
 
 type AuthMethod = 'phone' | 'email';
 
@@ -31,21 +30,15 @@ export default function RegisterScreen() {
   const { t } = useLocale();
   const [authMethod, setAuthMethod] = useState<AuthMethod>('phone');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
-  const setUser = useAuthStore((s) => s.setUser);
 
-  const handleSubmit = async (values: RegisterInput) => {
+  const handleSubmit = async (_values: RegisterInput) => {
     if (!agreedToTerms) {
       Alert.alert('Lỗi', t.auth.errors.agreeToTerms);
       return;
     }
 
     try {
-      const user = await authService.signUp(values);
-      setUser(user);
-      router.push({
-        pathname: '/verify-otp',
-        params: { email: user.email, purpose: 'register' },
-      });
+      router.replace('/select-role');
     } catch (error) {
       const message = error instanceof Error ? error.message : t.auth.errors.signUpFailed;
       Alert.alert('Lỗi', message);
@@ -61,12 +54,7 @@ export default function RegisterScreen() {
   };
 
   return (
-    <AuthLayout
-      step={t.register.step}
-      title={t.register.title}
-      subtitle={t.register.subtitle}
-      contentContainerStyle={styles.content}
-    >
+    <AuthLayout step={t.register.step} title={t.register.title} subtitle={t.register.subtitle}>
       {/* Tab Switcher */}
       <AuthTabSwitcher
         tabs={[
@@ -82,18 +70,10 @@ export default function RegisterScreen() {
         validationSchema={toFormikValidationSchema(RegisterSchema)}
         onSubmit={handleSubmit}
       >
-        {({
-          handleChange,
-          handleBlur,
-          handleSubmit,
-          values,
-          errors,
-          touched,
-          isSubmitting,
-        }) => (
-          <View style={styles.form}>
+        {({ handleChange, handleBlur, handleSubmit, values, errors, touched, isSubmitting }) => (
+          <ThemedView style={styles.mainContainer}>
             {/* Inputs Section */}
-            <View style={styles.inputsSection}>
+            <ThemedView style={styles.inputSection}>
               {/* Name */}
               <Input
                 label={t.auth.labels.fullName}
@@ -102,9 +82,7 @@ export default function RegisterScreen() {
                 value={values.name}
                 onChangeText={handleChange('name')}
                 onBlur={() => handleBlur('name')}
-                error={
-                  touched.name && errors.name ? errors.name : undefined
-                }
+                error={touched.name && errors.name ? errors.name : undefined}
               />
 
               {/* Phone or Email */}
@@ -115,9 +93,7 @@ export default function RegisterScreen() {
                   value={values.phone || ''}
                   onChangeText={handleChange('phone')}
                   onBlur={() => handleBlur('phone')}
-                  error={
-                    touched.phone && errors.phone ? errors.phone : undefined
-                  }
+                  error={touched.phone && errors.phone ? errors.phone : undefined}
                 />
               ) : (
                 <Input
@@ -129,9 +105,7 @@ export default function RegisterScreen() {
                   value={values.email}
                   onChangeText={handleChange('email')}
                   onBlur={handleBlur('email')}
-                  error={
-                    touched.email && errors.email ? errors.email : undefined
-                  }
+                  error={touched.email && errors.email ? errors.email : undefined}
                 />
               )}
 
@@ -144,72 +118,55 @@ export default function RegisterScreen() {
                 value={values.password}
                 onChangeText={handleChange('password')}
                 onBlur={() => handleBlur('password')}
-                error={
-                  touched.password && errors.password
-                    ? errors.password
-                    : undefined
-                }
+                error={touched.password && errors.password ? errors.password : undefined}
               />
 
               {/* Terms & Conditions */}
-              <TouchableOpacity
+              <Pressable
                 style={styles.checkboxContainer}
                 onPress={() => setAgreedToTerms(!agreedToTerms)}
               >
-                <View
-                  style={[
-                    styles.checkbox,
-                    agreedToTerms && styles.checkboxChecked,
-                  ]}
-                >
-                  {agreedToTerms && (
-                    <Ionicons name="checkmark" size={16} color="#fff" />
-                  )}
-                </View>
-                <View style={styles.termsTextContainer}>
-                  <Text style={styles.termsMainText}>
-                    {t.register.agreeTerms}
-                    <Text style={styles.termsLink}>{t.register.termsOfService}</Text>
-                    {t.register.and}
-                    <Text style={styles.termsLink}>{t.register.privacyPolicy}</Text>
-                    {t.register.ofDatVang}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            </View>
+                <ThemedView style={[styles.checkbox, agreedToTerms && styles.checkboxChecked]}>
+                  {agreedToTerms && <Ionicons name="checkmark" size={16} color="#fff" />}
+                </ThemedView>
+                <ThemedText style={styles.termsText}>
+                  {t.register.agreeTerms}
+                  <ThemedText style={styles.termsLink}>{t.register.termsOfService}</ThemedText>
+                  {t.register.and}
+                  <ThemedText style={styles.termsLink}>{t.register.privacyPolicy}</ThemedText>
+                  {t.register.ofDatVang}
+                </ThemedText>
+              </Pressable>
+            </ThemedView>
 
             {/* Buttons Section */}
-            <View style={styles.buttonsSection}>
+            <ThemedView style={styles.bottomSection}>
               {/* Submit Button */}
               <Button
                 label={t.register.continueButton}
                 onPress={() => handleSubmit()}
                 disabled={isSubmitting || !agreedToTerms}
                 loading={isSubmitting}
-                style={styles.button}
+                style={{ marginTop: 12 }}
               />
 
               {/* Social Login */}
               <SocialLoginButtons
-                onPress={(provider) =>
-                  Alert.alert(
-                    `${provider} Sign In chưa được triển khai`
-                  )
-                }
-                containerStyle={styles.socialSection}
+                onPress={(provider) => Alert.alert(`${provider} Sign In chưa được triển khai`)}
+                containerStyle={{ marginVertical: 20 }}
               />
 
               {/* Login Link */}
-              <View style={styles.footer}>
-                <Text style={styles.footerText}>{t.register.haveAccount}</Text>
+              <ThemedView style={styles.registerRow}>
+                <ThemedText style={styles.registerText}>{t.register.haveAccount}</ThemedText>
                 <Link href="/login" asChild>
-                  <TouchableOpacity>
-                    <Text style={styles.footerLink}>{t.register.signIn}</Text>
-                  </TouchableOpacity>
+                  <Pressable>
+                    <ThemedText style={styles.registerLink}>{t.register.signIn}</ThemedText>
+                  </Pressable>
                 </Link>
-              </View>
-            </View>
-          </View>
+              </ThemedView>
+            </ThemedView>
+          </ThemedView>
         )}
       </Formik>
     </AuthLayout>
@@ -217,16 +174,14 @@ export default function RegisterScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { marginBottom: 0 },
-  form: {
+  mainContainer: {
     flex: 1,
     justifyContent: 'space-between',
     gap: Spacing.lg,
   },
-  inputsSection: { gap: Spacing.lg },
-  buttonsSection: { gap: 0 },
-
-  /* Checkbox */
+  inputSection: {
+    gap: Spacing.lg,
+  },
   checkboxContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -238,7 +193,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     borderWidth: 2,
     borderColor: Palette.orange,
-    backgroundColor: Palette.white,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: Spacing.xs,
@@ -246,38 +200,30 @@ const styles = StyleSheet.create({
   checkboxChecked: {
     backgroundColor: Palette.orange,
   },
-  termsTextContainer: {
-    flex: 1,
-  },
-  termsMainText: {
+  termsText: {
     fontSize: FontSize.caption,
     color: Palette.textSecondary,
     lineHeight: 18,
+    flex: 1,
   },
   termsLink: {
     color: Palette.orange,
-    fontWeight: '600',
+    fontWeight: FontWeight.semibold,
   },
-
-  /* Button */
-  button: { marginTop: Spacing.md },
-
-  /* Social Section */
-  socialSection: {
-    marginVertical: Spacing.lg,
-  },
-
-  /* Footer */
-  footer: {
+  bottomSection: {},
+  registerRow: {
     flexDirection: 'row',
     justifyContent: 'center',
     gap: Spacing.xs,
     marginTop: Spacing.lg,
   },
-  footerText: { fontSize: FontSize.body, color: Palette.textSecondary },
-  footerLink: {
+  registerText: {
     fontSize: FontSize.body,
+    color: Palette.textSecondary,
+  },
+  registerLink: {
+    fontSize: FontSize.body,
+    fontWeight: FontWeight.semibold,
     color: Palette.orange,
-    fontWeight: '600',
   },
 });

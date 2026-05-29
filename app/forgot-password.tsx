@@ -1,19 +1,21 @@
+import { useLocale } from '@contexts/locale-context';
 import { Formik } from 'formik';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 
-import { router } from 'expo-router';
 import React from 'react';
 
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
+import { router } from 'expo-router';
+
 import { AuthLayout, Button, Input } from '@components/ui';
-import { FontSize, Palette, Spacing } from '@constants/theme';
 
 import { authService } from '@services/authService';
-import { useLocale } from '@contexts/locale-context';
 
-import { ForgotPasswordSchema } from '@schemas';
 import type { ForgotPasswordInput } from '@schemas';
+import { ForgotPasswordSchema } from '@schemas';
+
+import { FontSize, Palette, Spacing } from '@constants/theme';
 
 export default function ForgotPasswordScreen() {
   const { t } = useLocale();
@@ -21,14 +23,11 @@ export default function ForgotPasswordScreen() {
   const handleSubmit = async (values: ForgotPasswordInput) => {
     try {
       await authService.resetPassword(values.email);
-      Alert.alert(
-        'Đã gửi email',
-        t.forgotPassword.success,
-        [{ text: 'OK', onPress: () => router.back() }]
-      );
+      Alert.alert('Đã gửi email', t.forgotPassword.success, [
+        { text: 'OK', onPress: () => router.back() },
+      ]);
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Không thể gửi email';
+      const message = error instanceof Error ? error.message : 'Không thể gửi email';
       Alert.alert('Lỗi', message);
     }
   };
@@ -44,15 +43,7 @@ export default function ForgotPasswordScreen() {
         validationSchema={toFormikValidationSchema(ForgotPasswordSchema)}
         onSubmit={handleSubmit}
       >
-        {({
-          handleChange,
-          handleBlur,
-          handleSubmit,
-          values,
-          errors,
-          touched,
-          isSubmitting,
-        }) => (
+        {({ handleChange, handleBlur, handleSubmit, values, errors, touched, isSubmitting }) => (
           <View style={styles.form}>
             <View style={styles.inputsSection}>
               <Input
@@ -77,10 +68,7 @@ export default function ForgotPasswordScreen() {
                 style={styles.button}
               />
 
-              <TouchableOpacity
-                onPress={() => router.back()}
-                style={styles.backButton}
-              >
+              <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
                 <Text style={styles.backButtonText}>← {t.forgotPassword.backButton}</Text>
               </TouchableOpacity>
             </View>

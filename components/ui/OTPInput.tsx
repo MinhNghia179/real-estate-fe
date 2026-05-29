@@ -1,9 +1,10 @@
-import React, { forwardRef } from 'react';
+import { OtpInput as RNOtpInput } from 'react-native-otp-entry';
 
-import { StyleSheet, Text, View, type ViewStyle } from 'react-native';
+import React from 'react';
 
-import { OtpInput as RNOtpInput, type OtpInputRef } from 'react-native-otp-entry';
+import { StyleSheet, type ViewStyle } from 'react-native';
 
+import { ThemedText, ThemedView } from "@components/ui";
 import { FontSize, Palette, Spacing } from '@constants/theme';
 
 interface OTPInputProps {
@@ -11,55 +12,45 @@ interface OTPInputProps {
   error?: string;
   containerStyle?: ViewStyle;
   numberOfDigits?: number;
+  value?: string;
   onTextChange?: (text: string) => void;
   onFilled?: (text: string) => void;
 }
 
-export const OTPInput = forwardRef<OtpInputRef, OTPInputProps>(
-  (
-    {
-      label,
-      error,
-      containerStyle,
-      numberOfDigits = 6,
-      onTextChange,
-      onFilled,
-    },
-    ref
-  ) => {
-    return (
-      <View style={[styles.wrapper, containerStyle]}>
-        {label && <Text style={styles.label}>{label}</Text>}
-        <View
-          style={[
-            styles.container,
-            error && styles.containerError,
-          ]}
-        >
-          <RNOtpInput
-            ref={ref}
-            numberOfDigits={numberOfDigits}
-            focusColor={error ? Palette.badgeRed : Palette.orange}
-            onTextChange={onTextChange}
-            onFilled={onFilled}
-            secureTextEntry={false}
-            type="numeric"
-            theme={{
-              containerStyle: styles.otpInput,
-              pinCodeContainerStyle: styles.otpText,
-              pinCodeTextStyle: {
-                color: Palette.textPrimary,
-                fontSize: FontSize.h2,
-                fontWeight: '700',
-              },
-            }}
-          />
-        </View>
-        {error && <Text style={styles.error}>{error}</Text>}
-      </View>
-    );
-  }
-);
+export const OTPInput = ({
+  label,
+  error,
+  containerStyle,
+  numberOfDigits = 6,
+  onTextChange,
+  onFilled,
+}: OTPInputProps) => {
+  return (
+    <ThemedView style={[styles.wrapper, containerStyle]}>
+      {label && <ThemedText style={styles.label}>{label}</ThemedText>}
+      <ThemedView style={[styles.container, error && styles.containerError]}>
+        <RNOtpInput
+          numberOfDigits={numberOfDigits}
+          focusColor={error ? Palette.badgeRed : Palette.orange}
+          onTextChange={onTextChange}
+          onFilled={onFilled}
+          secureTextEntry={false}
+          type="numeric"
+          theme={{
+            containerStyle: styles.otpInput,
+            pinCodeContainerStyle: styles.otpText,
+            pinCodeTextStyle: {
+              color: Palette.textPrimary,
+              fontSize: FontSize.h2,
+              fontWeight: '700',
+            },
+          }}
+        />
+      </ThemedView>
+      {error && <ThemedText style={styles.error}>{error}</ThemedText>}
+    </ThemedView>
+  );
+};
 
 const styles = StyleSheet.create({
   wrapper: { gap: Spacing.sm },

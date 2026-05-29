@@ -1,14 +1,9 @@
 import React from 'react';
 
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  type ViewStyle,
-} from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, type ViewStyle } from 'react-native';
 
 import { FontSize, Palette, Spacing } from '@constants/theme';
+import { ThemedText, ThemedView } from "./index";
 
 interface SocialProvider {
   id: string;
@@ -33,27 +28,27 @@ export const SocialLoginButtons = ({
   containerStyle,
 }: SocialLoginButtonsProps) => {
   return (
-    <View style={containerStyle}>
+    <ThemedView style={containerStyle}>
       {/* Divider with lines */}
-      <View style={styles.dividerContainer}>
-        <View style={styles.dividerLine} />
-        <Text style={styles.dividerText}>hoặc tiếp tục với</Text>
-        <View style={styles.dividerLine} />
-      </View>
+      <ThemedView style={styles.dividerContainer}>
+        <ThemedView style={styles.dividerLine} />
+        <ThemedText style={styles.dividerText}>hoặc tiếp tục với</ThemedText>
+        <ThemedView style={styles.dividerLine} />
+      </ThemedView>
 
       {/* Buttons */}
-      <View style={styles.buttonsContainer}>
+      <ThemedView style={styles.buttonsContainer}>
         {providers.map((provider) => (
           <TouchableOpacity
             key={provider.id}
             style={styles.button}
             onPress={() => onPress(provider.id)}
           >
-            <Text style={styles.buttonText}>{provider.label}</Text>
+            <ThemedText style={styles.buttonText}>{provider.label}</ThemedText>
           </TouchableOpacity>
         ))}
-      </View>
-    </View>
+      </ThemedView>
+    </ThemedView>
   );
 };
 

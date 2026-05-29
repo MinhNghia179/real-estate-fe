@@ -91,7 +91,10 @@ export const CreateReviewSchema = z.object({
 });
 
 export const OTPSchema = z.object({
-  otp: z.string().length(6, { message: 'OTP phải có 6 chữ số' }).regex(/^[0-9]{6}$/, { message: 'OTP chỉ chứa số' }),
+  otp: z
+    .string()
+    .length(6, { message: 'OTP phải có 6 chữ số' })
+    .regex(/^[0-9]{6}$/, { message: 'OTP chỉ chứa số' }),
 });
 
 export type LoginInput = z.infer<typeof LoginSchema>;

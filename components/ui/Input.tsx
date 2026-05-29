@@ -5,14 +5,13 @@ import React, { useState } from 'react';
 import {
   TextInput as RNTextInput,
   StyleSheet,
-  Text,
   type TextInputProps,
   TouchableOpacity,
-  View,
   type ViewStyle,
 } from 'react-native';
 
 import { FontSize, Palette, Radius, Spacing } from '@constants/theme';
+import { ThemedText, ThemedView } from './index';
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -37,9 +36,9 @@ export const Input = ({
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <View style={[styles.wrapper, containerStyle]}>
-      {label && <Text style={styles.label}>{label}</Text>}
-      <View
+    <ThemedView style={[styles.wrapper, containerStyle]}>
+      {label && <ThemedText style={styles.label}>{label}</ThemedText>}
+      <ThemedView
         style={[
           styles.container,
           focused && styles.containerFocused,
@@ -47,16 +46,10 @@ export const Input = ({
         ]}
       >
         {(prefix || icon) && (
-          <View style={styles.prefix}>
+          <ThemedView style={styles.prefix}>
             {prefix}
-            {icon && !prefix && (
-              <Ionicons
-                name={icon}
-                size={20}
-                color={Palette.textMuted}
-              />
-            )}
-          </View>
+            {icon && !prefix && <Ionicons name={icon} size={20} color={Palette.textMuted} />}
+          </ThemedView>
         )}
         <RNTextInput
           style={[styles.input, style]}
@@ -75,9 +68,9 @@ export const Input = ({
             />
           </TouchableOpacity>
         )}
-      </View>
-      {!!error && <Text style={styles.error}>{error}</Text>}
-    </View>
+      </ThemedView>
+      {!!error && <ThemedText style={styles.error}>{error}</ThemedText>}
+    </ThemedView>
   );
 };
 

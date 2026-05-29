@@ -1,8 +1,9 @@
 import React from 'react';
 
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
+import { ThemedText, ThemedView } from "@components/ui";
 
-import { FontSize, Palette, Spacing } from '@constants/theme';
+import { FontSize, FontWeight, Palette, Spacing } from '@constants/theme';
 
 interface AuthTabSwitcherProps {
   tabs: { id: string; label: string }[];
@@ -10,37 +11,33 @@ interface AuthTabSwitcherProps {
   onTabChange: (tabId: string) => void;
 }
 
-export const AuthTabSwitcher = ({
-  tabs,
-  activeTab,
-  onTabChange,
-}: AuthTabSwitcherProps) => {
+export const AuthTabSwitcher = ({ tabs, activeTab, onTabChange }: AuthTabSwitcherProps) => {
   return (
-    <View style={styles.container}>
+    <ThemedView style={styles.container}>
       {tabs.map((tab) => (
-        <TouchableOpacity
+        <Pressable
           key={tab.id}
-          style={[styles.tab, activeTab === tab.id && styles.tabActive]}
+          style={[styles.tab, activeTab === tab.id ? styles.tabActive : styles.tabInactive]}
           onPress={() => onTabChange(tab.id)}
         >
-          <Text
+          <ThemedText
             style={[
               styles.tabText,
-              activeTab === tab.id && styles.tabTextActive,
+              activeTab === tab.id ? styles.tabTextActive : styles.tabTextInactive,
             ]}
           >
             {tab.label}
-          </Text>
-        </TouchableOpacity>
+          </ThemedText>
+        </Pressable>
       ))}
-    </View>
+    </ThemedView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: '#F3F4F6',
+    backgroundColor: Palette.divider,
     borderRadius: Spacing.md,
     padding: Spacing.xs,
     marginBottom: Spacing.xl,
@@ -50,19 +47,23 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.md,
     paddingHorizontal: Spacing.base,
     borderRadius: Spacing.sm,
-    backgroundColor: 'transparent',
     alignItems: 'center',
   },
   tabActive: {
-    backgroundColor: Palette.white,
+    backgroundColor: Palette.bgCard,
+  },
+  tabInactive: {
+    backgroundColor: 'transparent',
   },
   tabText: {
     fontSize: FontSize.body,
-    fontWeight: '500',
-    color: Palette.textMuted,
   },
   tabTextActive: {
+    fontWeight: FontWeight.semibold,
     color: Palette.textPrimary,
-    fontWeight: '600',
+  },
+  tabTextInactive: {
+    fontWeight: FontWeight.medium,
+    color: Palette.textMuted,
   },
 });

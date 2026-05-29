@@ -3,6 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, TextInput, View, type ViewStyle } from 'react-native';
 
 import { FontSize, Palette, Spacing } from '@constants/theme';
+import { ThemedText, ThemedView } from "./index";
 
 interface PhoneInputProps {
   label?: string;
@@ -28,18 +29,13 @@ export const PhoneInput = ({
   countryEmoji = '🇻🇳',
 }: PhoneInputProps) => {
   return (
-    <View style={containerStyle}>
-      {label && <Text style={styles.label}>{label}</Text>}
-      <View
-        style={[
-          styles.inputContainer,
-          error ? styles.inputError : styles.inputNormal,
-        ]}
-      >
-        <Text style={styles.countryCode}>
+    <ThemedView style={containerStyle}>
+      {label && <ThemedText style={styles.label}>{label}</ThemedText>}
+      <ThemedView style={[styles.inputContainer, error ? styles.inputError : styles.inputNormal]}>
+        <ThemedText style={styles.countryCode}>
           {countryEmoji} {countryCode}
-        </Text>
-        <TextInput
+        </ThemedText>
+        <ThemedTextInput
           style={styles.input}
           placeholder={placeholder}
           placeholderTextColor={Palette.textMuted}
@@ -48,9 +44,9 @@ export const PhoneInput = ({
           onChangeText={onChangeText}
           onBlur={onBlur}
         />
-      </View>
-      {error && <Text style={styles.errorText}>{error}</Text>}
-    </View>
+      </ThemedView>
+      {error && <ThemedText style={styles.errorText}>{error}</ThemedText>}
+    </ThemedView>
   );
 };
 

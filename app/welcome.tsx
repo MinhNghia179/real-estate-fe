@@ -1,6 +1,7 @@
-import { Image } from 'expo-image';
-import { Link } from 'expo-router';
+import { useLocale } from '@contexts/locale-context';
+
 import React, { useRef, useState } from 'react';
+
 import {
   Dimensions,
   FlatList,
@@ -11,11 +12,13 @@ import {
   View,
 } from 'react-native';
 
+import { Image } from 'expo-image';
+import { Link } from 'expo-router';
+
 import { Text } from '@/components/text';
 import { Button } from '@/components/ui/Button';
 import { LanguageSelector } from '@/components/ui/language-selector';
 import { Palette, Radius, Spacing } from '@/constants/theme';
-import { useLocale } from '@contexts/locale-context';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -78,7 +81,6 @@ export default function WelcomeScreen() {
 
       {/* Content overlay */}
       <View style={styles.contentContainer}>
-
         {/* Label — uppercase tag kiểu luxury */}
         <View style={styles.labelWrapper}>
           <View style={styles.labelLine} />
@@ -104,10 +106,7 @@ export default function WelcomeScreen() {
           {slides.map((_: Slide, index: number) => (
             <View
               key={index}
-              style={[
-                styles.dot,
-                index === activeIndex ? styles.dotActive : styles.dotInactive,
-              ]}
+              style={[styles.dot, index === activeIndex ? styles.dotActive : styles.dotInactive]}
             />
           ))}
         </View>

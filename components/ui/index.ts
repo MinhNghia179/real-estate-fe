@@ -19,3 +19,5 @@ export { SearchBar } from './SearchBar';
 export { SocialLoginButtons } from './SocialLoginButtons';
 export { StepSelector } from './StepSelector';
 export { TabSwitcher } from './TabSwitcher';
+export { ThemedText } from './ThemedText';
+export { ThemedView } from './ThemedView';

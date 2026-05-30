@@ -104,7 +104,7 @@ export const vi = {
     resendIn: 'Gửi lại sau ',
     verifyButton: 'Xác nhận',
     changePhone: 'Thay đổi số điện thoại',
-    infoTitle: 'Không nhận được tín nhận?',
+    infoTitle: 'Không nhận được tin nhắn?',
     infoDesc: 'Thử nhận mã qua cuộc gọi tự động hoặc Zalo OA.',
     errors: {
       invalidOtp: 'Mã OTP không hợp lệ',
@@ -112,6 +112,7 @@ export const vi = {
     },
   },
   selectRole: {
+    step: 'Bước 3 / 4',
     title: 'Bạn là ai?',
     subtitle: 'Chọn vai trò để có nhân hóa trải nghiệm. Có thể đổi sau.',
     buyer: 'Người mua / thuê',
@@ -126,7 +127,9 @@ export const vi = {
   completeProfile: {
     step: 'Bước 4 / 4',
     title: 'Hoàn tất hồ sơ',
-    subtitle: 'Một vài thông tin để chúng tôi có thể giới thiệu và tin phục hợp với bạn.',
+    subtitle: 'Một vài thông tin để chúng tôi gợi ý tin phù hợp với bạn.',
+    avatarTitle: 'Ảnh đại diện',
+    avatarHint: 'JPG, PNG · tối đa 5MB',
     nameLabel: 'HỌ VÀ TÊN',
     namePlaceholder: 'Nguyễn Minh Anh',
     dateOfBirthLabel: 'NGÀY SINH',
@@ -142,7 +145,7 @@ export const vi = {
       rent: 'Cho thuê',
       office: 'Văn phòng',
     },
-    completeButton: 'Hoàn tất - Vào ứng dụng',
+    completeButton: 'Hoàn tất · Vào ứng dụng',
     skipButton: 'Bỏ qua và vào ứng dụng',
   },
 } as const;

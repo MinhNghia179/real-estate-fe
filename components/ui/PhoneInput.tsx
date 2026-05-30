@@ -1,9 +1,10 @@
 import React from 'react';
 
-import { StyleSheet, Text, TextInput, View, type ViewStyle } from 'react-native';
+import { StyleSheet, TextInput, type ViewStyle } from 'react-native';
 
 import { FontSize, Palette, Spacing } from '@constants/theme';
-import { ThemedText, ThemedView } from "./index";
+
+import { ThemedText, ThemedView } from './index';
 
 interface PhoneInputProps {
   label?: string;
@@ -35,7 +36,7 @@ export const PhoneInput = ({
         <ThemedText style={styles.countryCode}>
           {countryEmoji} {countryCode}
         </ThemedText>
-        <ThemedTextInput
+        <TextInput
           style={styles.input}
           placeholder={placeholder}
           placeholderTextColor={Palette.textMuted}

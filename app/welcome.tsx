@@ -18,7 +18,7 @@ import { Link } from 'expo-router';
 import { Text } from '@/components/text';
 import { Button } from '@/components/ui/Button';
 import { LanguageSelector } from '@/components/ui/language-selector';
-import { Palette, Radius, Spacing } from '@/constants/theme';
+import { Palette, Spacing } from '@/constants/theme';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 

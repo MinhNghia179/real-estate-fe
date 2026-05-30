@@ -2,13 +2,12 @@ import { useLocale } from '@contexts/locale-context';
 
 import React, { useState } from 'react';
 
-import { Alert, Pressable, StyleSheet } from 'react-native';
+import { Alert, Pressable, StyleSheet, View } from 'react-native';
 
 import { Image } from 'expo-image';
-import { ThemedText, ThemedView } from "@components/ui";
 import { router } from 'expo-router';
 
-import { AuthLayout, Button } from '@components/ui';
+import { AuthLayout, Button, ThemedText, ThemedView } from '@components/ui';
 
 import { FontSize, FontWeight, Palette, Spacing } from '@constants/theme';
 
@@ -17,8 +16,8 @@ type RoleType = 'buyer' | 'broker' | null;
 const ICONS = {
   buyer: require('@/assets/icons/icon-role-buyer.svg'),
   broker: require('@/assets/icons/icon-role-broker.svg'),
+  info: require('@/assets/icons/icon-info.svg'),
 };
-import { ThemedText, ThemedView } from "@components/ui";
 
 export default function SelectRoleScreen() {
   const { t } = useLocale();
@@ -47,50 +46,57 @@ export default function SelectRoleScreen() {
         style={[styles.card, isSelected ? styles.cardSelected : styles.cardUnselected]}
         onPress={() => setSelectedRole(id)}
       >
-        <ThemedView style={styles.iconContainer}>
+        <View style={styles.iconContainer}>
           <Image source={ICONS[id]} style={[styles.icon, { opacity: isSelected ? 1 : 0.7 }]} />
-        </ThemedView>
+        </View>
 
         {/* Content */}
-        <ThemedView style={styles.contentContainer}>
+        <View style={styles.contentContainer}>
           <ThemedText style={styles.cardTitle}>{title}</ThemedText>
           <ThemedText style={styles.cardDescription}>{desc}</ThemedText>
 
           {/* Badges */}
-          <ThemedView style={styles.badgesRow}>
+          <View style={styles.badgesRow}>
             {badges.map((badge) => (
-              <ThemedView key={badge} style={styles.badgeContainer}>
+              <View key={badge} style={styles.badgeContainer}>
                 <ThemedText style={styles.badgeText}>{badge}</ThemedText>
-              </ThemedView>
+              </View>
             ))}
-          </ThemedView>
-        </ThemedView>
+          </View>
+        </View>
 
-        {/* Checkmark - Top Right Corner */}
-        {isSelected && (
-          <ThemedView style={styles.checkmark}>
+        {/* Checkmark or Empty Circle - Top Right Corner */}
+        {isSelected ? (
+          <View style={styles.checkmark}>
             <ThemedText style={styles.checkmarkText}>✓</ThemedText>
-          </ThemedView>
+          </View>
+        ) : (
+          <View style={styles.emptyCircle} />
         )}
       </Pressable>
     );
   };
 
   return (
-    <AuthLayout step="Step 3 / 4" title={t.selectRole.title} subtitle={t.selectRole.subtitle}>
-      <ThemedView style={styles.mainContainer}>
+    <AuthLayout
+      step={t.selectRole.step}
+      title={t.selectRole.title}
+      subtitle={t.selectRole.subtitle}
+    >
+      <View style={styles.mainContainer}>
         {/* Role Cards */}
-        <ThemedView style={styles.cardsSection}>
-          <ThemedView style={styles.cardWrapper}>
+        <View style={styles.cardsSection}>
+          <View style={styles.cardWrapper}>
             <RoleCard id="buyer" />
             <RoleCard id="broker" />
-          </ThemedView>
+          </View>
 
           {/* Info Banner */}
           <ThemedView style={styles.infoBanner}>
-            <ThemedText style={styles.infoBannerText}>ℹ {t.selectRole.infoBanner}</ThemedText>
+            <Image source={ICONS.info} style={styles.infoBannerIcon} />
+            <ThemedText style={styles.infoBannerText}>{t.selectRole.infoBanner}</ThemedText>
           </ThemedView>
-        </ThemedView>
+        </View>
 
         {/* Continue Button */}
         <Button
@@ -99,7 +105,7 @@ export default function SelectRoleScreen() {
           disabled={!selectedRole}
           fullWidth
         />
-      </ThemedView>
+      </View>
     </AuthLayout>
   );
 }
@@ -136,8 +142,8 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   icon: {
-    width: 56,
-    height: 56,
+    width: 48,
+    height: 48,
   },
   contentContainer: {
     flex: 1,
@@ -185,14 +191,33 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.bold,
     fontSize: FontSize.body,
   },
+  emptyCircle: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: Palette.border,
+  },
   infoBanner: {
     backgroundColor: Palette.divider,
     borderRadius: Spacing.md,
     padding: Spacing.base,
     marginTop: Spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  infoBannerIcon: {
+    width: 20,
+    height: 20,
+    tintColor: Palette.textSecondary,
   },
   infoBannerText: {
     fontSize: FontSize.body,
     color: Palette.textSecondary,
+    flex: 1,
   },
 });

@@ -2,13 +2,13 @@ import { useLocale } from '@contexts/locale-context';
 
 import React, { useEffect, useState } from 'react';
 
-import { Alert, Pressable, StyleSheet } from 'react-native';
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 
 import { AuthLayout, Button, OTPInput } from '@components/ui';
 
-import { ThemedText, ThemedView } from "@components/ui";
 import { FontSize, FontWeight, Palette } from '@constants/theme';
 
 const OTP_LENGTH = 6;
@@ -105,51 +105,45 @@ export default function VerifyOTPScreen() {
       subtitle={`${t.verifyOtp.subtitle} ${maskedPhone}`}
       contentContainerStyle={{ marginBottom: 0 }}
     >
-      <ThemedView style={styles.mainContainer}>
-        {/* OTP Input Component */}
-        <ThemedView style={styles.otpContainer}>
-          <OTPInput
-            key={resetKey}
-            numberOfDigits={OTP_LENGTH}
-            onTextChange={setOtp}
-            onFilled={handleOTPFilled}
-          />
-        </ThemedView>
+      <View style={styles.mainContainer}>
+        <View style={styles.topSection}>
+          {/* OTP Input Component */}
+          <View style={styles.otpContainer}>
+            <OTPInput
+              key={resetKey}
+              numberOfDigits={OTP_LENGTH}
+              onTextChange={setOtp}
+              onFilled={handleOTPFilled}
+            />
+          </View>
 
-        {/* Resend Section */}
-        <ThemedView style={styles.resendSection}>
-          <ThemedText style={styles.resendText}>
-            {t.verifyOtp.didNotReceive}
-          </ThemedText>
-          {canResend ? (
-            <Pressable onPress={handleResendOTP} disabled={isLoading}>
-              <ThemedText style={styles.resendButton}>
-                {t.verifyOtp.resendButton}
-              </ThemedText>
-            </Pressable>
-          ) : (
-            <ThemedText style={styles.resendDisabledText}>
-              {t.verifyOtp.resendIn}
-              {formatTime(timeLeft)}
-            </ThemedText>
-          )}
-        </ThemedView>
+          {/* Resend Section */}
+          <View style={styles.resendSection}>
+            <Text style={styles.resendText}>{t.verifyOtp.didNotReceive}</Text>
+            {canResend ? (
+              <Pressable onPress={handleResendOTP} disabled={isLoading}>
+                <Text style={styles.resendButton}>{t.verifyOtp.resendButton}</Text>
+              </Pressable>
+            ) : (
+              <Text style={styles.resendDisabledText}>
+                {t.verifyOtp.resendIn}
+                <Text style={styles.resendTimer}>{formatTime(timeLeft)}</Text>
+              </Text>
+            )}
+          </View>
 
-        {/* Info Alert Box */}
-        <ThemedView style={styles.infoBanner}>
-          <ThemedText style={styles.infoIcon}>ℹ</ThemedText>
-          <ThemedView style={styles.infoBannerContent}>
-            <ThemedText style={styles.infoBannerTitle}>
-              {t.verifyOtp.infoTitle}
-            </ThemedText>
-            <ThemedText style={styles.infoBannerDescription}>
-              {t.verifyOtp.infoDesc}
-            </ThemedText>
-          </ThemedView>
-        </ThemedView>
+          {/* Info Alert Box */}
+          <View style={styles.infoBanner}>
+            <Image source={require('@/assets/icons/icon-info.svg')} style={styles.infoIcon} />
+            <View style={styles.infoBannerContent}>
+              <Text style={styles.infoBannerTitle}>{t.verifyOtp.infoTitle}</Text>
+              <Text style={styles.infoBannerDescription}>{t.verifyOtp.infoDesc}</Text>
+            </View>
+          </View>
+        </View>
 
         {/* Action Buttons */}
-        <ThemedView style={styles.actionButtonsContainer}>
+        <View style={styles.actionButtonsContainer}>
           <Button
             label={t.verifyOtp.verifyButton}
             onPress={() => handleVerifyOTP()}
@@ -158,16 +152,11 @@ export default function VerifyOTPScreen() {
             fullWidth
           />
 
-          <Pressable
-            onPress={handleChangePhone}
-            style={styles.changePhoneButton}
-          >
-            <ThemedText style={styles.changePhoneText}>
-              {t.verifyOtp.changePhone}
-            </ThemedText>
+          <Pressable onPress={handleChangePhone} style={styles.changePhoneButton}>
+            <Text style={styles.changePhoneText}>{t.verifyOtp.changePhone}</Text>
           </Pressable>
-        </ThemedView>
-      </ThemedView>
+        </View>
+      </View>
     </AuthLayout>
   );
 }
@@ -176,16 +165,19 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     justifyContent: 'space-between',
-    gap: 20,
+  },
+  topSection: {
+    // Allows the top elements to stay clustered together
   },
   otpContainer: {
-    marginBottom: 24,
+    marginTop: 0,
+    marginBottom: 0,
   },
   resendSection: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: 24,
   },
   resendText: {
     fontSize: FontSize.body,
@@ -199,24 +191,25 @@ const styles = StyleSheet.create({
   resendDisabledText: {
     fontSize: FontSize.body,
     color: Palette.textMuted,
-    fontWeight: FontWeight.semibold,
+  },
+  resendTimer: {
+    fontWeight: FontWeight.bold,
+    color: Palette.textPrimary,
   },
   infoBanner: {
     backgroundColor: '#FFFBEB',
     borderRadius: 16,
     borderWidth: 2,
     borderColor: Palette.orange,
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
     paddingVertical: 16,
-    marginBottom: 24,
-    marginTop: 20,
     flexDirection: 'row',
     gap: 12,
   },
   infoIcon: {
-    fontSize: 24,
-    color: Palette.orange,
-    fontWeight: FontWeight.semibold,
+    width: 24,
+    height: 24,
+    tintColor: Palette.orange,
   },
   infoBannerContent: {
     flex: 1,
@@ -232,14 +225,16 @@ const styles = StyleSheet.create({
     color: Palette.orange,
     lineHeight: 20,
   },
-  actionButtonsContainer: {},
+  actionButtonsContainer: {
+    marginTop: 40,
+  },
   changePhoneButton: {
-    paddingVertical: 12,
+    paddingVertical: 16,
     alignItems: 'center',
   },
   changePhoneText: {
     fontSize: FontSize.body,
     color: Palette.textSecondary,
-    fontWeight: FontWeight.medium,
+    fontWeight: FontWeight.semibold,
   },
 });

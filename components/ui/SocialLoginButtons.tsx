@@ -1,9 +1,10 @@
 import React from 'react';
 
-import { StyleSheet, Text, TouchableOpacity, View, type ViewStyle } from 'react-native';
+import { StyleSheet, TouchableOpacity, type ViewStyle } from 'react-native';
 
 import { FontSize, Palette, Spacing } from '@constants/theme';
-import { ThemedText, ThemedView } from "./index";
+
+import { ThemedText, ThemedView } from './index';
 
 interface SocialProvider {
   id: string;

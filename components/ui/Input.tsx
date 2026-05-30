@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 
 import { FontSize, Palette, Radius, Spacing } from '@constants/theme';
+
 import { ThemedText, ThemedView } from './index';
 
 interface InputProps extends TextInputProps {

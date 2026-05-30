@@ -18,7 +18,6 @@ import {
   SocialLoginButtons,
 } from '@components/ui';
 
-import { ThemedText, ThemedView } from "@components/ui";
 import type { RegisterInput } from '@schemas';
 import { RegisterSchema } from '@schemas';
 
@@ -71,20 +70,9 @@ export default function RegisterScreen() {
         onSubmit={handleSubmit}
       >
         {({ handleChange, handleBlur, handleSubmit, values, errors, touched, isSubmitting }) => (
-          <ThemedView style={styles.mainContainer}>
+          <View style={styles.mainContainer}>
             {/* Inputs Section */}
-            <ThemedView style={styles.inputSection}>
-              {/* Name */}
-              <Input
-                label={t.auth.labels.fullName}
-                placeholder={t.auth.placeholders.fullName}
-                icon="person-outline"
-                value={values.name}
-                onChangeText={handleChange('name')}
-                onBlur={() => handleBlur('name')}
-                error={touched.name && errors.name ? errors.name : undefined}
-              />
-
+            <View style={styles.inputSection}>
               {/* Phone or Email */}
               {authMethod === 'phone' ? (
                 <PhoneInput
@@ -126,21 +114,27 @@ export default function RegisterScreen() {
                 style={styles.checkboxContainer}
                 onPress={() => setAgreedToTerms(!agreedToTerms)}
               >
-                <ThemedView style={[styles.checkbox, agreedToTerms && styles.checkboxChecked]}>
+                <View style={[styles.checkbox, agreedToTerms && styles.checkboxChecked]}>
                   {agreedToTerms && <Ionicons name="checkmark" size={16} color="#fff" />}
-                </ThemedView>
-                <ThemedText style={styles.termsText}>
+                </View>
+                <Text style={styles.termsText}>
                   {t.register.agreeTerms}
-                  <ThemedText style={styles.termsLink}>{t.register.termsOfService}</ThemedText>
+                  <Text style={styles.termsLink}>{t.register.termsOfService}</Text>
                   {t.register.and}
-                  <ThemedText style={styles.termsLink}>{t.register.privacyPolicy}</ThemedText>
+                  <Text style={styles.termsLink}>{t.register.privacyPolicy}</Text>
                   {t.register.ofDatVang}
-                </ThemedText>
+                </Text>
               </Pressable>
-            </ThemedView>
+            </View>
 
             {/* Buttons Section */}
-            <ThemedView style={styles.bottomSection}>
+            <View style={styles.bottomSection}>
+              {/* Social Login */}
+              <SocialLoginButtons
+                onPress={(provider) => Alert.alert(`${provider} Sign In chưa được triển khai`)}
+                containerStyle={{ marginVertical: 20 }}
+              />
+
               {/* Submit Button */}
               <Button
                 label={t.register.continueButton}
@@ -149,24 +143,8 @@ export default function RegisterScreen() {
                 loading={isSubmitting}
                 style={{ marginTop: 12 }}
               />
-
-              {/* Social Login */}
-              <SocialLoginButtons
-                onPress={(provider) => Alert.alert(`${provider} Sign In chưa được triển khai`)}
-                containerStyle={{ marginVertical: 20 }}
-              />
-
-              {/* Login Link */}
-              <ThemedView style={styles.registerRow}>
-                <ThemedText style={styles.registerText}>{t.register.haveAccount}</ThemedText>
-                <Link href="/login" asChild>
-                  <Pressable>
-                    <ThemedText style={styles.registerLink}>{t.register.signIn}</ThemedText>
-                  </Pressable>
-                </Link>
-              </ThemedView>
-            </ThemedView>
-          </ThemedView>
+            </View>
+          </View>
         )}
       </Formik>
     </AuthLayout>
@@ -211,19 +189,4 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.semibold,
   },
   bottomSection: {},
-  registerRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: Spacing.xs,
-    marginTop: Spacing.lg,
-  },
-  registerText: {
-    fontSize: FontSize.body,
-    color: Palette.textSecondary,
-  },
-  registerLink: {
-    fontSize: FontSize.body,
-    fontWeight: FontWeight.semibold,
-    color: Palette.orange,
-  },
 });

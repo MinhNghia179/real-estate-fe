@@ -1,7 +1,8 @@
 import React from 'react';
 
 import { Pressable, StyleSheet } from 'react-native';
-import { ThemedText, ThemedView } from "@components/ui";
+
+import { ThemedText, ThemedView } from '@components/ui';
 
 import { FontSize, FontWeight, Palette, Spacing } from '@constants/theme';
 

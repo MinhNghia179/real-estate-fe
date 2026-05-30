@@ -1,32 +1,46 @@
+import { useLocale } from '@contexts/locale-context';
 import { Formik } from 'formik';
+import { z } from 'zod';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
-import * as ImagePicker from 'expo-image-picker';
-import { router, useLocalSearchParams } from 'expo-router';
+
 import React, { useState } from 'react';
 
 import {
   Alert,
+  Platform,
   Image as RNImage,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
 
-import { AuthLayout, Button, Input } from '@components/ui';
-import { FontSize, Palette, Spacing } from '@constants/theme';
+import { Image } from 'expo-image';
+import * as ImagePicker from 'expo-image-picker';
+import { router, useLocalSearchParams } from 'expo-router';
+
+import { AuthLayout, Button } from '@components/ui';
 
 import { useAuthStore } from '@stores/authStore';
-import { useLocale } from '@contexts/locale-context';
-import { z } from 'zod';
+
+import { FontSize, FontWeight, Palette, Radius, Spacing } from '@constants/theme';
 
 type Role = 'buyer' | 'broker';
 
+const ICONS = {
+  person: require('@/assets/icons/icon-person.svg'),
+  calendar: require('@/assets/icons/icon-calendar.svg'),
+  location: require('@/assets/icons/icon-location.svg'),
+  camera: require('@/assets/icons/icon-camera.svg'),
+};
+
+const INTEREST_KEYS = ['apartment', 'house', 'land', 'villa', 'rent', 'office'] as const;
+
 const UpdateProfileSchema = z.object({
   name: z.string().min(2, { message: 'Tên tối thiểu 2 ký tự' }),
-  phone: z
-    .string()
-    .regex(/^[0-9]{10,11}$/, { message: 'Số điện thoại không hợp lệ' }),
+  dob: z.string().optional(),
+  address: z.string().optional(),
 });
 
 type UpdateProfileInput = z.infer<typeof UpdateProfileSchema>;
@@ -38,6 +52,7 @@ export default function CompleteProfileScreen() {
   const setUser = useAuthStore((s) => s.setUser);
 
   const [avatar, setAvatar] = useState<string | null>(null);
+  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
 
   const handlePickAvatar = async () => {
     try {
@@ -56,6 +71,12 @@ export default function CompleteProfileScreen() {
     }
   };
 
+  const toggleInterest = (id: string) => {
+    setSelectedInterests((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
   const handleSubmit = async (values: UpdateProfileInput) => {
     try {
       if (user) {
@@ -63,7 +84,6 @@ export default function CompleteProfileScreen() {
           ...user,
           displayName: values.name,
           name: values.name,
-          phone: values.phone,
           photoURL: avatar || null,
           avatar: avatar || undefined,
         });
@@ -78,111 +98,164 @@ export default function CompleteProfileScreen() {
         },
       ]);
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Cập nhật thất bại';
+      const message = error instanceof Error ? error.message : 'Cập nhật thất bại';
       Alert.alert('Lỗi', message);
     }
   };
 
+  // Get user initials for avatar placeholder
+  const getInitials = (name?: string) => {
+    if (!name) return 'NM';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase();
+  };
+
   const initialValues: UpdateProfileInput = {
     name: user?.name || '',
-    phone: user?.phone || '',
+    dob: '',
+    address: '',
   };
 
   return (
     <AuthLayout
-      step="Bước 4 / 4"
-      title="Hoàn tất hồ sơ"
-      subtitle="Thêm ảnh đại diện và thông tin cá nhân"
-      contentContainerStyle={styles.content}
+      step={t.completeProfile.step}
+      title={t.completeProfile.title}
+      subtitle={t.completeProfile.subtitle}
     >
       <Formik
         initialValues={initialValues}
         validationSchema={toFormikValidationSchema(UpdateProfileSchema)}
         onSubmit={handleSubmit}
       >
-        {({
-          handleChange,
-          handleBlur,
-          handleSubmit,
-          values,
-          errors,
-          touched,
-          isSubmitting,
-        }) => (
-          <ThemedView style={styles.form}>
-            {/* Avatar Section */}
-            <ThemedView style={styles.avatarSection}>
-              <TouchableOpacity
-                style={styles.avatarContainer}
-                onPress={handlePickAvatar}
-              >
+        {({ handleChange, handleBlur, handleSubmit, values, errors, touched, isSubmitting }) => (
+          <View style={styles.form}>
+            {/* Avatar Section - Horizontal Layout */}
+            <View style={styles.avatarSection}>
+              <TouchableOpacity style={styles.avatarContainer} onPress={handlePickAvatar}>
                 {avatar ? (
-                  <RNImage
-                    source={{ uri: avatar }}
-                    style={styles.avatar}
-                  />
+                  <RNImage source={{ uri: avatar }} style={styles.avatar} />
                 ) : (
-                  <ThemedView style={styles.avatarPlaceholder}>
-                    <ThemedText style={styles.avatarPlaceholderText}>📷</ThemedText>
-                  </ThemedView>
+                  <View style={styles.avatarPlaceholder}>
+                    <Text style={styles.avatarInitials}>{getInitials(values.name)}</Text>
+                  </View>
                 )}
-                <ThemedView style={styles.editBadge}>
-                  <ThemedText style={styles.editBadgeText}>✏️</ThemedText>
-                </ThemedView>
+                {/* Camera Badge */}
+                <View style={styles.cameraBadge}>
+                  <Image source={ICONS.camera} style={styles.cameraBadgeIcon} />
+                </View>
               </TouchableOpacity>
-              <ThemedText style={styles.avatarHint}>Chọn ảnh đại diện</ThemedText>
-            </ThemedView>
+              <View style={styles.avatarInfo}>
+                <Text style={styles.avatarTitle}>{t.completeProfile.avatarTitle}</Text>
+                <Text style={styles.avatarHint}>{t.completeProfile.avatarHint}</Text>
+              </View>
+            </View>
 
-            {/* Form Fields */}
-            <Input
-              label="Họ và tên"
-              placeholder="Nhập tên của bạn"
-              value={values.name}
-              onChangeText={handleChange('name')}
-              onBlur={handleBlur('name')}
-              error={touched.name && errors.name ? errors.name : undefined}
-            />
+            {/* Form Fields with SVG Icons */}
 
-            <Input
-              label="Số điện thoại"
-              placeholder="0123456789"
-              keyboardType="phone-pad"
-              value={values.phone}
-              onChangeText={handleChange('phone')}
-              onBlur={handleBlur('phone')}
-              error={
-                touched.phone && errors.phone ? errors.phone : undefined
-              }
-            />
+            {/* HỌ VÀ TÊN */}
+            <View style={styles.fieldGroup}>
+              <Text style={styles.fieldLabel}>{t.completeProfile.nameLabel}</Text>
+              <View
+                style={[
+                  styles.inputContainer,
+                  touched.name && errors.name ? styles.inputError : null,
+                ]}
+              >
+                <Image
+                  source={ICONS.person}
+                  style={styles.inputIcon}
+                  tintColor={Palette.textMuted}
+                />
+                <TextInput
+                  style={styles.textInput}
+                  placeholder={t.completeProfile.namePlaceholder}
+                  placeholderTextColor={Palette.textMuted}
+                  value={values.name}
+                  onChangeText={handleChange('name')}
+                  onBlur={handleBlur('name')}
+                />
+              </View>
+              {touched.name && errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
+            </View>
 
-            {/* Role Info */}
-            <ThemedView style={styles.roleInfo}>
-              <ThemedText style={styles.roleLabel}>Vai trò đã chọn:</ThemedText>
-              <ThemedText style={styles.roleValue}>
-                {role === 'buyer'
-                  ? '👤 Người mua / Thuê'
-                  : '💼 Môi giới / Bán'}
-              </ThemedText>
-            </ThemedView>
+            {/* NGÀY SINH */}
+            <View style={styles.fieldGroup}>
+              <Text style={styles.fieldLabel}>{t.completeProfile.dateOfBirthLabel}</Text>
+              <View style={styles.inputContainer}>
+                <Image
+                  source={ICONS.calendar}
+                  style={styles.inputIcon}
+                  tintColor={Palette.textMuted}
+                />
+                <TextInput
+                  style={styles.textInput}
+                  placeholder={t.completeProfile.dateOfBirthPlaceholder}
+                  placeholderTextColor={Palette.textMuted}
+                  value={values.dob}
+                  onChangeText={handleChange('dob')}
+                  onBlur={handleBlur('dob')}
+                  keyboardType="number-pad"
+                />
+              </View>
+            </View>
+
+            {/* ĐỊA CHỈ */}
+            <View style={styles.fieldGroup}>
+              <Text style={styles.fieldLabel}>{t.completeProfile.addressLabel}</Text>
+              <View style={styles.inputContainer}>
+                <Image
+                  source={ICONS.location}
+                  style={styles.inputIcon}
+                  tintColor={Palette.textMuted}
+                />
+                <TextInput
+                  style={styles.textInput}
+                  placeholder={t.completeProfile.addressPlaceholder}
+                  placeholderTextColor={Palette.textMuted}
+                  value={values.address}
+                  onChangeText={handleChange('address')}
+                  onBlur={handleBlur('address')}
+                />
+              </View>
+            </View>
+
+            {/* Interest Section */}
+            <View style={styles.interestSection}>
+              <Text style={styles.fieldLabel}>{t.completeProfile.interestsLabel}</Text>
+              <View style={styles.chipsContainer}>
+                {INTEREST_KEYS.map((key) => {
+                  const isSelected = selectedInterests.includes(key);
+                  return (
+                    <TouchableOpacity
+                      key={key}
+                      style={[styles.chip, isSelected && styles.chipSelected]}
+                      onPress={() => toggleInterest(key)}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>
+                        {t.completeProfile.interestTypes[key]}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
+
+            {/* Spacer */}
+            <View style={{ flex: 1, minHeight: 40 }} />
 
             {/* Submit Button */}
             <Button
-              label="Hoàn tất"
+              label={t.completeProfile.completeButton}
               onPress={() => handleSubmit()}
               disabled={isSubmitting}
               loading={isSubmitting}
-              style={styles.button}
+              style={styles.submitButton}
             />
-
-            {/* Skip Link */}
-            <TouchableOpacity
-              onPress={() => router.replace('/(tabs)')}
-              style={styles.skipButton}
-            >
-              <ThemedText style={styles.skipText}>Bỏ qua và vào ứng dụng</ThemedText>
-            </TouchableOpacity>
-          </ThemedView>
+          </View>
         )}
       </Formik>
     </AuthLayout>
@@ -190,89 +263,147 @@ export default function CompleteProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { marginBottom: Spacing.xl },
+  /* Form */
+  form: {
+    flex: 1,
+    gap: Spacing.lg,
+  },
 
-  /* Avatar Section */
-  form: { gap: Spacing.lg, marginBottom: Spacing.xl },
+  /* Avatar Section - Horizontal */
   avatarSection: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: Spacing.lg,
+    gap: Spacing.base,
+    marginBottom: Spacing.sm,
   },
   avatarContainer: {
     position: 'relative',
-    marginBottom: Spacing.md,
   },
   avatar: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     backgroundColor: Palette.border,
   },
   avatarPlaceholder: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: '#F3F4F6',
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#FFECD2',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarInitials: {
+    fontSize: 24,
+    fontWeight: FontWeight.bold,
+    color: Palette.orange,
+  },
+  cameraBadge: {
+    position: 'absolute',
+    bottom: 0,
+    right: -2,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#333333',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: Palette.border,
-    borderStyle: 'dashed',
-  },
-  avatarPlaceholderText: {
-    fontSize: 48,
-  },
-  editBadge: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Palette.orange,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 3,
     borderColor: Palette.white,
   },
-  editBadgeText: {
-    fontSize: 18,
+  cameraBadgeIcon: {
+    width: 14,
+    height: 14,
+    tintColor: Palette.white,
+  },
+  avatarInfo: {
+    gap: 4,
+  },
+  avatarTitle: {
+    fontSize: FontSize.h3,
+    fontWeight: FontWeight.semibold,
+    color: Palette.textPrimary,
   },
   avatarHint: {
-    fontSize: FontSize.caption,
+    fontSize: FontSize.body,
     color: Palette.textMuted,
   },
 
-  /* Role Info */
-  roleInfo: {
-    backgroundColor: '#F3F4F6',
-    borderRadius: Spacing.md,
-    padding: Spacing.md,
+  /* Field Group */
+  fieldGroup: {
+    gap: 6,
   },
-  roleLabel: {
+  fieldLabel: {
     fontSize: FontSize.caption,
+    fontWeight: FontWeight.semibold,
     color: Palette.textSecondary,
     textTransform: 'uppercase',
-    fontWeight: '600',
-    marginBottom: Spacing.xs,
+    letterSpacing: 0.5,
   },
-  roleValue: {
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F5F5F5',
+    borderRadius: Radius.md,
+    borderWidth: 1.5,
+    borderColor: Palette.border,
+    minHeight: 52,
+    paddingHorizontal: Spacing.md,
+    gap: Spacing.sm,
+  },
+  inputError: {
+    borderWidth: 1.5,
+    borderColor: Palette.badgeRed,
+  },
+  inputIcon: {
+    width: 22,
+    height: 22,
+  },
+  textInput: {
+    flex: 1,
     fontSize: FontSize.h3,
     color: Palette.textPrimary,
-    fontWeight: '600',
+    paddingVertical: Platform.OS === 'ios' ? 14 : 10,
+  },
+  errorText: {
+    fontSize: FontSize.caption,
+    color: Palette.badgeRed,
   },
 
-  /* Button */
-  button: { marginTop: Spacing.lg },
-
-  /* Skip Button */
-  skipButton: {
-    paddingVertical: Spacing.md,
-    alignItems: 'center',
+  /* Interest Section */
+  interestSection: {
+    gap: Spacing.sm,
+    marginTop: Spacing.sm,
   },
-  skipText: {
+  chipsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.sm,
+    marginTop: 4,
+  },
+  chip: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: Radius.pill,
+    borderWidth: 1.5,
+    borderColor: Palette.border,
+    backgroundColor: Palette.white,
+  },
+  chipSelected: {
+    borderColor: Palette.textPrimary,
+    backgroundColor: Palette.textPrimary,
+  },
+  chipText: {
     fontSize: FontSize.body,
-    color: Palette.textSecondary,
-    fontWeight: '500',
+    fontWeight: FontWeight.medium,
+    color: Palette.textPrimary,
+  },
+  chipTextSelected: {
+    color: Palette.white,
+  },
+
+  /* Submit Button */
+  submitButton: {
+    marginTop: Spacing.lg,
   },
 });

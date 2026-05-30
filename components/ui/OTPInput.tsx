@@ -4,7 +4,8 @@ import React from 'react';
 
 import { StyleSheet, type ViewStyle } from 'react-native';
 
-import { ThemedText, ThemedView } from "@components/ui";
+import { ThemedText, ThemedView } from '@components/ui';
+
 import { FontSize, Palette, Spacing } from '@constants/theme';
 
 interface OTPInputProps {

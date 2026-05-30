@@ -4,7 +4,7 @@ import { toFormikValidationSchema } from 'zod-formik-adapter';
 
 import React, { useState } from 'react';
 
-import { Alert, Pressable, StyleSheet } from 'react-native';
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Link, router } from 'expo-router';
 
@@ -15,8 +15,6 @@ import {
   Input,
   PhoneInput,
   SocialLoginButtons,
-  ThemedText,
-  ThemedView,
 } from '@components/ui';
 
 import { useAuthStore } from '@stores/authStore';
@@ -67,9 +65,9 @@ export default function LoginScreen() {
         onSubmit={handleSubmit}
       >
         {({ handleChange, handleBlur, handleSubmit, values, errors, touched, isSubmitting }) => (
-          <ThemedView style={styles.mainContainer}>
+          <View style={styles.mainContainer}>
             {/* Inputs Section */}
-            <ThemedView style={styles.inputSection}>
+            <View style={styles.inputSection}>
               {/* Email Input */}
               {authMethod === 'email' ? (
                 <Input
@@ -109,13 +107,13 @@ export default function LoginScreen() {
               {/* Forgot Password Link */}
               <Link href="/forgot-password" asChild>
                 <Pressable style={styles.forgotPasswordButton}>
-                  <ThemedText style={styles.forgotPasswordText}>{t.login.forgotPassword}</ThemedText>
+                  <Text style={styles.forgotPasswordText}>{t.login.forgotPassword}</Text>
                 </Pressable>
               </Link>
-            </ThemedView>
+            </View>
 
             {/* Buttons Section */}
-            <ThemedView style={styles.bottomSection}>
+            <View style={styles.bottomSection}>
               {/* Submit Button */}
               <Button
                 label={t.login.signInButton}
@@ -132,16 +130,16 @@ export default function LoginScreen() {
               />
 
               {/* Register Link */}
-              <ThemedView style={styles.registerRow}>
-                <ThemedText style={styles.registerText}>{t.login.noAccount}</ThemedText>
+              <View style={styles.registerRow}>
+                <Text style={styles.registerText}>{t.login.noAccount}</Text>
                 <Link href="/register" asChild>
                   <Pressable>
-                    <ThemedText style={styles.registerLink}>{t.login.signUpNow}</ThemedText>
+                    <Text style={styles.registerLink}>{t.login.signUpNow}</Text>
                   </Pressable>
                 </Link>
-              </ThemedView>
-            </ThemedView>
-          </ThemedView>
+              </View>
+            </View>
+          </View>
         )}
       </Formik>
     </AuthLayout>

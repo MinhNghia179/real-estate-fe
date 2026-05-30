@@ -112,6 +112,7 @@ export const en = {
     },
   },
   selectRole: {
+    step: 'Step 3 / 4',
     title: 'Who Are You?',
     subtitle: 'Personalize your experience. You can change anytime.',
     buyer: 'Buyer / Renter',
@@ -126,13 +127,15 @@ export const en = {
   completeProfile: {
     step: 'Step 4 / 4',
     title: 'Complete Your Profile',
-    subtitle: 'A few details so we can recommend and match suitable options for you.',
+    subtitle: 'A few details so we can recommend suitable options for you.',
+    avatarTitle: 'Profile Photo',
+    avatarHint: 'JPG, PNG · max 5MB',
     nameLabel: 'FULL NAME',
     namePlaceholder: 'Nguyễn Minh Anh',
     dateOfBirthLabel: 'DATE OF BIRTH',
     dateOfBirthPlaceholder: '15 / 04 / 1995',
     addressLabel: 'ADDRESS',
-    addressPlaceholder: 'Quận Cầu Giấy, Hà Nội',
+    addressPlaceholder: 'District, City',
     interestsLabel: 'INTERESTED IN (select at least 2)',
     interestTypes: {
       apartment: 'Apartment',
@@ -142,7 +145,7 @@ export const en = {
       rent: 'For Rent',
       office: 'Office',
     },
-    completeButton: 'Complete - Enter App',
+    completeButton: 'Complete · Enter App',
     skipButton: 'Skip and Enter App',
   },
   completeProfileJa: {

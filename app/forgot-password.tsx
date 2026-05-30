@@ -4,7 +4,7 @@ import { toFormikValidationSchema } from 'zod-formik-adapter';
 
 import React from 'react';
 
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { router } from 'expo-router';
 
@@ -65,12 +65,12 @@ export default function ForgotPasswordScreen() {
                 onPress={() => handleSubmit()}
                 disabled={isSubmitting}
                 loading={isSubmitting}
-                style={styles.button}
+                fullWidth
               />
 
-              <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+              <Pressable onPress={() => router.back()} style={styles.backButton}>
                 <Text style={styles.backButtonText}>← {t.forgotPassword.backButton}</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
         )}
@@ -88,7 +88,6 @@ const styles = StyleSheet.create({
   },
   inputsSection: { gap: Spacing.lg },
   buttonsSection: { gap: 0 },
-  button: { marginTop: Spacing.md },
   backButton: { alignItems: 'center', paddingVertical: Spacing.lg },
   backButtonText: {
     fontSize: FontSize.body,
